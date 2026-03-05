@@ -39,7 +39,9 @@ namespace CapaDatos
                                 IdVenta = Convert.ToInt32(dr["IdVenta"]),
                                 NombreCliente = dr["NombreCliente"].ToString(),
                                 ModoPago = dr["ModoPago"].ToString(),
-                                MontoTotal = Convert.ToDecimal(dr["MontoTotal"])
+                                MontoTotal = Convert.ToDecimal(dr["MontoTotal"]),
+                                PresupuestoGastado = Convert.ToDecimal(dr["PresupuestoGastado"]),
+                                Extra = Convert.ToDecimal(dr["Extra"])
                             });
                         }
                     }

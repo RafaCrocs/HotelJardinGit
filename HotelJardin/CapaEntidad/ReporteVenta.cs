@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CapaEntidad
 {
-    public class ReporteVenta
+    public class  ReporteVenta
     {
         public string FechaRegistro { get; set; }
         public int IdUsuario { get; set; }
@@ -14,6 +14,8 @@ namespace CapaEntidad
         public string NombreCliente { get; set; }
         public string ModoPago { get; set; }
         public decimal MontoTotal { get; set; }
+        public decimal PresupuestoGastado { get; set; }
+        public decimal Extra { get; set; }
 
 
 

@@ -37,7 +37,6 @@ namespace Capa_Presentacion
             this.MenuClientes = new FontAwesome.Sharp.IconMenuItem();
             this.MenuInventario = new FontAwesome.Sharp.IconMenuItem();
             this.MenuReporte = new FontAwesome.Sharp.IconMenuItem();
-            this.MenuConfiguracion = new FontAwesome.Sharp.IconMenuItem();
             this.Menu1 = new System.Windows.Forms.MenuStrip();
             this.btnIncioSalir = new FontAwesome.Sharp.IconMenuItem();
             this.lblInicioUsuario = new FontAwesome.Sharp.IconMenuItem();
@@ -55,8 +54,7 @@ namespace Capa_Presentacion
             this.MenuVenta,
             this.MenuClientes,
             this.MenuInventario,
-            this.MenuReporte,
-            this.MenuConfiguracion});
+            this.MenuReporte});
             this.Menu2.Location = new System.Drawing.Point(0, 67);
             this.Menu2.Name = "Menu2";
             this.Menu2.Size = new System.Drawing.Size(961, 77);
@@ -129,20 +127,6 @@ namespace Capa_Presentacion
             this.MenuReporte.Size = new System.Drawing.Size(155, 52);
             this.MenuReporte.Text = "Reporte";
             this.MenuReporte.Click += new System.EventHandler(this.MenuReporte_Click);
-            // 
-            // MenuConfiguracion
-            // 
-            this.MenuConfiguracion.AutoSize = false;
-            this.MenuConfiguracion.AutoToolTip = true;
-            this.MenuConfiguracion.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.MenuConfiguracion.IconChar = FontAwesome.Sharp.IconChar.ScrewdriverWrench;
-            this.MenuConfiguracion.IconColor = System.Drawing.Color.Black;
-            this.MenuConfiguracion.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.MenuConfiguracion.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.MenuConfiguracion.Name = "MenuConfiguracion";
-            this.MenuConfiguracion.Size = new System.Drawing.Size(180, 52);
-            this.MenuConfiguracion.Text = "Configuraciones";
-            this.MenuConfiguracion.Click += new System.EventHandler(this.MenuConfiguracion_Click);
             // 
             // Menu1
             // 
@@ -235,7 +219,6 @@ namespace Capa_Presentacion
         private FontAwesome.Sharp.IconMenuItem MenuClientes;
         private FontAwesome.Sharp.IconMenuItem MenuInventario;
         private FontAwesome.Sharp.IconMenuItem MenuReporte;
-        private FontAwesome.Sharp.IconMenuItem MenuConfiguracion;
         private Panel Contenedor;
         private FontAwesome.Sharp.IconMenuItem btnIncioSalir;
         private FontAwesome.Sharp.IconMenuItem lblInicioUsuario;

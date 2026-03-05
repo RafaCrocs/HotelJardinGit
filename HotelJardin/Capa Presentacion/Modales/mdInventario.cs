@@ -19,66 +19,26 @@ namespace Capa_Presentacion.Modales
 
         public Inventario _Inventario { get; set; }
 
+        private List<Inventario> inventario = new CN_Inventario().Listar();
+
         public mdInventario()
         {
             InitializeComponent();
         }
 
+        private void cargarGrid()
+        {
+            List<Inventario> lista = new CN_Inventario().Listar();
+            dataGridInventario.DataSource = lista;
+        }
+
+
+
         private void mdProducto_Load(object sender, EventArgs e)
         {
-            foreach (DataGridViewColumn columna in dataGridInventario.Columns)
-            {
-                if (columna.Visible == true && columna.Name != "btnSelecionar")
-                {
-                    cmbBoxGuardar.Items.Add(new OpcionCombo() { Valor = columna.Name, Texto = columna.HeaderText });
-                }
-            }
-            cmbBoxGuardar.DisplayMember = "Texto";
-            cmbBoxGuardar.ValueMember = "Value";
-            cmbBoxGuardar.SelectedIndex = 1;
-
-
-
-
-
-            List<Inventario> lista = new CN_Inventario().Listar();
-            foreach (Inventario item in lista)
-            {
-                dataGridInventario.Rows.Add(new object[] {
-                "",
-                item.IdInventario,
-                item.Codigo,
-                item.Descripcion,
-                item.Cantidad,
-                item.Precio
-                });
-            }
-
+            cargarGrid();
         }
 
-        private void iconButton1_Click(object sender, EventArgs e)
-        {
-            string columnaFiltro = ((OpcionCombo)cmbBoxGuardar.SelectedItem).Valor.ToString();
-            string search = txtbusqueda.Text?.Trim() ?? "";
-
-            if (string.IsNullOrEmpty(search))
-            {
-                // optionally show all rows
-                foreach (DataGridViewRow row in dataGridInventario.Rows)
-                    row.Visible = true;
-                return;
-            }
-
-            foreach (DataGridViewRow row in dataGridInventario.Rows)
-            {
-                if (row.IsNewRow) continue; // skip the 'new' row if present
-
-                string cellText = Convert.ToString(row.Cells[columnaFiltro].Value); // safe for null
-                bool match = cellText.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0;
-
-                row.Visible = match;
-            }
-        }
 
         private void dataGridInventario_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -92,6 +52,20 @@ namespace Capa_Presentacion.Modales
                 };
                 this.DialogResult = DialogResult.OK;
                 this.Close();
+            }
+        }
+
+        private void txtbusqueda_TextChanged(object sender, EventArgs e)
+        {
+
+            if (txtbusqueda.Text.Length >= 3)
+            {
+                var listaFiltrada = inventario.Where(x => (x.Descripcion ?? "").ToLower().Contains((txtbusqueda.Text).ToLower()) || (x.Codigo.ToString() ?? "").Contains((txtbusqueda.Text)) || (x.Proveedor ?? "").ToLower().Contains((txtbusqueda.Text).ToLower())).ToList();
+                dataGridInventario.DataSource = listaFiltrada;
+            }
+            else
+            {
+                dataGridInventario.DataSource = inventario;
             }
         }
     }

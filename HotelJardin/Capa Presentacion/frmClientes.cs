@@ -22,37 +22,17 @@ namespace Capa_Presentacion
             InitializeComponent();
         }
 
+        private List<Cliente> clientes = new List<Cliente>();
+
+        private void cargarGrid()
+        {
+            clientes = new CN_Cliente().Listar();
+            dataGridCliente.DataSource = clientes;
+        }
+
         private void frmClientes_Load(object sender, EventArgs e)
         {
-            //Mostrar opciones en cbmBoxguardar
-            foreach (DataGridViewColumn columna in dataGridCliente.Columns)
-            {
-                if (columna.Visible == true && columna.Name != "btnSelecionar")
-                {
-                    cmbBoxGuardar.Items.Add(new OpcionCombo() { Valor = columna.Name, Texto = columna.HeaderText });
-                }
-            }
-            cmbBoxGuardar.DisplayMember = "Texto";
-            cmbBoxGuardar.ValueMember = "Value";
-            cmbBoxGuardar.SelectedIndex = 2;
-
-
-
-            //Mostrar usuarios en el datagridview
-            List<Cliente> lista = new CN_Cliente().Listar();
-
-
-            foreach (Cliente item in lista)
-            {
-                dataGridCliente.Rows.Add(new object[] {
-                "",
-                item.IdCliente,
-                item.CodigoCliente,
-                item.NombreCompleto,
-                item.Correo,
-                item.Presupuesto,
-                });
-            }
+            cargarGrid();
         }
 
         private void frmInicioGuardar_Click(object sender, EventArgs e)
@@ -60,82 +40,62 @@ namespace Capa_Presentacion
             string Mensaje = string.Empty;
             try
             {
+                // Al crear o editar, el presupuesto actual (Presupuesto) 
+                // inicialmente es igual al PresupuestoInicial si es un cliente nuevo.
                 Cliente obj = new Cliente()
                 {
                     IdCliente = Convert.ToInt32(txtId.Text),
                     NombreCompleto = txtNombreCompleto.Text,
                     CodigoCliente = Convert.ToInt32(txtCodigoCliente.Text),
                     Correo = txtCorreo.Text,
-                    Presupuesto = Convert.ToDecimal(txtPresupuesto.Text),
+                    PresupuestoInicial = Convert.ToDecimal(txtPresupuestoInicial.Text),
+                    // Si es nuevo, el saldo disponible es el total inicial
+                    Presupuesto = Convert.ToInt32(txtId.Text) == 0 ? 
+                                  Convert.ToDecimal(txtPresupuestoInicial.Text) : 
+                                  Convert.ToDecimal(txtPresupuesto.Text)
                 };
-
-
 
                 if (obj.IdCliente == 0)
                 {
                     int IdClienteGenerado = new CN_Cliente().Registrar(obj, out Mensaje);
-
-
                     if (IdClienteGenerado != 0)
                     {
-                        dataGridCliente.Rows.Add(new object[] {
-                        "",
-                        IdClienteGenerado,
-                        Convert.ToInt32(txtCodigoCliente.Text),
-                        txtNombreCompleto.Text,
-                        txtCorreo.Text,
-                        Convert.ToDecimal(txtPresupuesto.Text)
-                    });
                         Limpiar();
                     }
-                    else
-                    {
-                        MessageBox.Show(Mensaje);
-                    }
+                    else { MessageBox.Show(Mensaje); }
                 }
                 else
                 {
                     bool resultado = new CN_Cliente().Editar(obj, out Mensaje);
                     if (resultado)
                     {
-                        DataGridViewRow rowEncontrada = null;
                         foreach (DataGridViewRow row in dataGridCliente.Rows)
                         {
                             if (Convert.ToInt32(row.Cells["IdCliente"].Value) == obj.IdCliente)
                             {
-                                rowEncontrada = row;
+                                row.Cells["NombreCompleto"].Value = obj.NombreCompleto;
+                                row.Cells["CodigoCliente"].Value = obj.CodigoCliente;
+                                row.Cells["Correo"].Value = obj.Correo;
+                                row.Cells["PresupuestoInicial"].Value = obj.PresupuestoInicial;
+                                row.Cells["Presupuesto"].Value = obj.Presupuesto;
                                 break;
                             }
                         }
-                        if (rowEncontrada != null)
-                        {
-                            rowEncontrada.Cells["NombreCompleto"].Value = txtNombreCompleto.Text;
-                            rowEncontrada.Cells["Codigo"].Value = Convert.ToInt32(txtCodigoCliente.Text);
-                            rowEncontrada.Cells["Correo"].Value = txtCorreo.Text;
-                            rowEncontrada.Cells["Presupuesto"].Value = Convert.ToDecimal(txtPresupuesto.Text);
-                        }
                         Limpiar();
-
-
-                    }
-                    else
-                    {
-                        MessageBox.Show("Algo malio sal", Mensaje);
                     }
                 }
+                cargarGrid();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Datos Logicos...", "Error", MessageBoxButtons.OKCancel);
-                Limpiar();
-            }
+            catch { MessageBox.Show("Error en el formato de los datos."); }
         }
         private void Limpiar()
         {
             txtNombreCompleto.Text = "";
             txtCodigoCliente.Text = "";
             txtCorreo.Text = "";
+            txtPresupuestoInicial.Text = "";
             txtPresupuesto.Text = "";
+            txtId.Text = "0";
         }
 
         private void dataGridCliente_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
@@ -184,87 +144,57 @@ namespace Capa_Presentacion
                     // Use existing column names from designer
                     txtId.Text = row.Cells["IdCliente"].Value?.ToString() ?? "0";
                     txtNombreCompleto.Text = row.Cells["NombreCompleto"].Value?.ToString() ?? "";
-                    txtCodigoCliente.Text = row.Cells["Codigo"].Value?.ToString() ?? "";
+                    txtCodigoCliente.Text = row.Cells["CodigoCliente"].Value?.ToString() ?? "";
                     txtCorreo.Text = row.Cells["Correo"].Value?.ToString() ?? "";
+                    txtPresupuestoInicial.Text = row.Cells["PresupuestoInicial"].Value?.ToString() ?? "";
                     txtPresupuesto.Text = row.Cells["Presupuesto"].Value?.ToString() ?? "";
-                }
+                }   
             }
         }
 
         private void iconButton3_Click(object sender, EventArgs e)
         {
-            if (Convert.ToInt32(txtId.Text) != 0)
+            if (!int.TryParse(txtId.Text, out int idCliente) || idCliente == 0)
+                return;
+
+            if (MessageBox.Show("¿Desea eliminar el Cliente?", "Mensaje", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                if (MessageBox.Show("¿Desea eliminar el Cliente?", "Mensaje", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                string Mensaje = string.Empty;
+                Cliente objCliente = new Cliente() { IdCliente = idCliente };
+
+                bool resultado = new CN_Cliente().Eliminar(objCliente, out Mensaje);
+                if (resultado)
                 {
-                    string Mensaje = string.Empty;
-                    Cliente objCliente = new Cliente()
-                    {
-                        IdCliente = Convert.ToInt32(txtId.Text)
-                    };
-                    bool resultado = new CN_Cliente().Eliminar(objCliente, out Mensaje);
-                    if (resultado)
-                    {
-                        // Buscar la fila correspondiente por IdUsuario (valor de BD)
-                        int idCliente = objCliente.IdCliente;
-                        DataGridViewRow rowEncontrada = null;
-                        foreach (DataGridViewRow r in dataGridCliente.Rows)
-                        {
-                            if (r.Cells["IdCliente"].Value != null &&
-                                int.TryParse(r.Cells["IdCliente"].Value.ToString(), out int idCell) &&
-                                idCell == idCliente)
-                            {
-                                rowEncontrada = r;
-                                break;
-                            }
-                        }
-                        if (rowEncontrada != null)
-                        {
-                            dataGridCliente.Rows.Remove(rowEncontrada);
-                            Limpiar();
-                        }
-                        else
-                        {
-                            MessageBox.Show("No se encontró la fila correspondiente al Articulo eliminado.");
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show(Mensaje, "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    }
+                    txtId.Text = "0";
+                    Limpiar();
+                    cargarGrid();
+                }
+                else
+                {
+                    MessageBox.Show(Mensaje, "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
         }
 
-        private void limpiarBuscar_Click(object sender, EventArgs e)
+        
+
+        
+
+        private void btnLimpiar_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("¿Desea limpiar el formulario?", "Mensaje", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                Limpiar();
-            }
+            Limpiar();
         }
 
-        private void buscar_Click(object sender, EventArgs e)
+        private void txtbusqueda_TextChanged(object sender, EventArgs e)
         {
-            string columnaFiltro = ((OpcionCombo)cmbBoxGuardar.SelectedItem).Valor.ToString();
-            string search = txtbusqueda.Text?.Trim() ?? "";
-
-            if (string.IsNullOrEmpty(search))
+            if (txtbusqueda.Text.Length >= 3)
             {
-                // optionally show all rows
-                foreach (DataGridViewRow row in dataGridCliente.Rows)
-                    row.Visible = true;
-                return;
+                var listaFiltrada = clientes.Where(x => (x.NombreCompleto ?? "").ToLower().Contains((txtbusqueda.Text).ToLower()) || (x.CodigoCliente.ToString() ?? "").ToLower().Contains((txtbusqueda.Text).ToLower())).ToList();
+                dataGridCliente.DataSource = listaFiltrada;
             }
-
-            foreach (DataGridViewRow row in dataGridCliente.Rows)
+            else
             {
-                if (row.IsNewRow) continue; // skip the 'new' row if present
-
-                string cellText = Convert.ToString(row.Cells[columnaFiltro].Value); // safe for null
-                bool match = cellText.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0;
-
-                row.Visible = match;
+                dataGridCliente.DataSource = clientes;
             }
         }
     }

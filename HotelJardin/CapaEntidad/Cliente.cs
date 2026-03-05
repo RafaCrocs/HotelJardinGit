@@ -11,7 +11,9 @@ namespace CapaEntidad
         public int IdCliente { get; set; }
         public int CodigoCliente { get; set; }
         public string NombreCompleto { get; set; }
-        public Decimal Presupuesto { get; set; }
         public string Correo { get; set; }
+        public decimal PresupuestoInicial { get; set; }
+        public decimal Presupuesto { get; set; }
+        public string FechaRegistro { get; set; }
     }
 }

@@ -102,7 +102,7 @@ namespace CapaDatos
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("IdUsuario", obj.oUsuario.IdUsuario);
-                        cmd.Parameters.AddWithValue("IdCliente", obj.oCliente.IdCliente); // debe estar poblado
+                        cmd.Parameters.AddWithValue("IdCliente", obj.oCliente.IdCliente);
                         cmd.Parameters.AddWithValue("NombreCliente", obj.NombreCliente);
                         cmd.Parameters.AddWithValue("ModoPago", obj.ModoPago);
                         cmd.Parameters.AddWithValue("NumeroFact", obj.NumeroFact);

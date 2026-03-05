@@ -29,7 +29,11 @@ namespace Capa_Presentacion
         {
             List<ReporteVenta> lista = new List<ReporteVenta>();
 
-            lista = new CN_Reporte().Venta(date1.Value.ToString(), date2.Value.ToString());
+            // ✅ Fix: usar formato ISO 8601, reconocido universalmente por SQL Server
+            lista = new CN_Reporte().Venta(
+                date1.Value.ToString("yyyy-MM-dd"),
+                date2.Value.ToString("yyyy-MM-dd")
+            );
 
             dataGridViewReporte.Rows.Clear();
 
@@ -42,7 +46,9 @@ namespace Capa_Presentacion
                     rv.IdVenta,
                     rv.NombreCliente,
                     rv.ModoPago,
-                    rv.MontoTotal.ToString("0.00")
+                    rv.MontoTotal.ToString("0.00"),
+                    rv.PresupuestoGastado.ToString("0.00"),
+                    rv.Extra.ToString("0.00")
                 });
             }
 
@@ -67,12 +73,14 @@ namespace Capa_Presentacion
 
                 dt.Rows.Add(new object[]
                 {
-            row.Cells[0].Value?.ToString() ?? string.Empty,
-            row.Cells[1].Value?.ToString() ?? string.Empty,
-            row.Cells[2].Value?.ToString() ?? string.Empty,
-            row.Cells[3].Value?.ToString() ?? string.Empty,
-            row.Cells[4].Value?.ToString() ?? string.Empty,
-            row.Cells[5].Value?.ToString() ?? string.Empty
+                    row.Cells[0].Value?.ToString() ?? string.Empty,
+                    row.Cells[1].Value?.ToString() ?? string.Empty,
+                    row.Cells[2].Value?.ToString() ?? string.Empty,
+                    row.Cells[3].Value?.ToString() ?? string.Empty,
+                    row.Cells[4].Value?.ToString() ?? string.Empty,
+                    row.Cells[5].Value?.ToString() ?? string.Empty,
+                    row.Cells[6].Value?.ToString() ?? string.Empty,
+                    row.Cells[7].Value?.ToString() ?? string.Empty
                 });
             }
 

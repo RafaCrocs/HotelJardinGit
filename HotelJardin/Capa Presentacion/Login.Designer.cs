@@ -29,9 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
-            this.lblLoginUsuario = new System.Windows.Forms.Label();
             this.lblLogin1 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panelLogin = new System.Windows.Forms.Panel();
             this.btnLoginIngresar = new FontAwesome.Sharp.IconButton();
             this.btnLoginSalir = new FontAwesome.Sharp.IconButton();
@@ -42,41 +40,21 @@
             this.lblLoginContra = new System.Windows.Forms.Label();
             this.lblIniciodeSesion = new System.Windows.Forms.Label();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.lblLoginUsuario = new System.Windows.Forms.Label();
             this.panelLogin.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
-            // 
-            // lblLoginUsuario
-            // 
-            this.lblLoginUsuario.BackColor = System.Drawing.Color.SeaGreen;
-            this.lblLoginUsuario.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lblLoginUsuario.Location = new System.Drawing.Point(0, 0);
-            this.lblLoginUsuario.Name = "lblLoginUsuario";
-            this.lblLoginUsuario.Size = new System.Drawing.Size(266, 450);
-            this.lblLoginUsuario.TabIndex = 0;
             // 
             // lblLogin1
             // 
             this.lblLogin1.BackColor = System.Drawing.Color.Beige;
             this.lblLogin1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLogin1.Location = new System.Drawing.Point(-2, 280);
+            this.lblLogin1.Location = new System.Drawing.Point(0, 280);
             this.lblLogin1.Name = "lblLogin1";
-            this.lblLogin1.Size = new System.Drawing.Size(269, 45);
+            this.lblLogin1.Size = new System.Drawing.Size(267, 45);
             this.lblLogin1.TabIndex = 1;
-            this.lblLogin1.Text = "Programa Facturacion";
+            this.lblLogin1.Text = "Programa de Facturacion";
             this.lblLogin1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.Color.SeaGreen;
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(12, 82);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(244, 155);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
             // 
             // panelLogin
             // 
@@ -88,7 +66,6 @@
             this.panelLogin.Controls.Add(this.txtLoginUsuario);
             this.panelLogin.Controls.Add(this.lblLoginUsu);
             this.panelLogin.Controls.Add(this.lblLoginContra);
-            this.panelLogin.Controls.Add(this.lblIniciodeSesion);
             this.panelLogin.Controls.Add(this.pictureBox2);
             this.panelLogin.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelLogin.Location = new System.Drawing.Point(266, 0);
@@ -199,11 +176,12 @@
             this.lblIniciodeSesion.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblIniciodeSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.lblIniciodeSesion.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIniciodeSesion.Location = new System.Drawing.Point(31, 43);
+            this.lblIniciodeSesion.Location = new System.Drawing.Point(0, 126);
             this.lblIniciodeSesion.Name = "lblIniciodeSesion";
-            this.lblIniciodeSesion.Size = new System.Drawing.Size(224, 37);
+            this.lblIniciodeSesion.Size = new System.Drawing.Size(266, 46);
             this.lblIniciodeSesion.TabIndex = 0;
             this.lblIniciodeSesion.Text = "Inicio de Sesion";
+            this.lblIniciodeSesion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pictureBox2
             // 
@@ -215,20 +193,28 @@
             this.pictureBox2.TabIndex = 8;
             this.pictureBox2.TabStop = false;
             // 
+            // lblLoginUsuario
+            // 
+            this.lblLoginUsuario.BackColor = System.Drawing.Color.SeaGreen;
+            this.lblLoginUsuario.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lblLoginUsuario.Location = new System.Drawing.Point(0, 0);
+            this.lblLoginUsuario.Name = "lblLoginUsuario";
+            this.lblLoginUsuario.Size = new System.Drawing.Size(266, 450);
+            this.lblLoginUsuario.TabIndex = 0;
+            // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.panelLogin);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.lblIniciodeSesion);
             this.Controls.Add(this.lblLogin1);
+            this.Controls.Add(this.panelLogin);
             this.Controls.Add(this.lblLoginUsuario);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panelLogin.ResumeLayout(false);
             this.panelLogin.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
@@ -237,10 +223,7 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Label lblLoginUsuario;
         private System.Windows.Forms.Label lblLogin1;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Panel panelLogin;
         private System.Windows.Forms.Label lblLoginUsu;
         private System.Windows.Forms.Label lblLoginContra;
@@ -251,5 +234,6 @@
         private FontAwesome.Sharp.IconButton btnLoginSalir;
         private System.Windows.Forms.PictureBox pictureBox2;
         private FontAwesome.Sharp.IconButton btnLoginIngresar;
+        private System.Windows.Forms.Label lblLoginUsuario;
     }
 }

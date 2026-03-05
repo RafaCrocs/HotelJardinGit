@@ -38,7 +38,7 @@ namespace Capa_Presentacion
             txtCodigo.Text = "";
             txtTotal.Text = "";
             txtCantidadArticulos.Text = "";
-            txtColones.Text = "";
+            txtTotalVenta.Text = "";
 
             if (this.Controls.ContainsKey("txtPresupuesto"))
             {
@@ -96,94 +96,32 @@ namespace Capa_Presentacion
                                 ctrl.Text = (-presupuestoInicial).ToString("0.00");
                             }
                         }
+                        if(txtQRCliente.Text == "1111")
+                        {
+                            Console.WriteLine();
+                        }
                     }
                     catch
                     {
                         presupuestoInicial = 0m;
                         clienteSeleccionado = true;
-                        
+
                     }
                 }
             }
         }
 
-        private void txtQRCliente_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                // Evitar el sonido de 'ding' y la repetición de la tecla
-                e.Handled = true;
-                e.SuppressKeyPress = true;
-
-                var input = txtQRCliente.Text?.Trim() ?? "";
-
-                if (string.IsNullOrEmpty(input))
-                {
-                    MessageBox.Show("Ingrese un código de cliente.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!int.TryParse(input, out int codigo))
-                {
-                    MessageBox.Show("El código debe ser un número válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Buscar cliente por código usando la lista actual. Mejor crear un método específico en CN_Cliente si la lista es grande.
-                List<Cliente> lista;
-                try
-                {
-                    lista = new CN_Cliente().Listar();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al obtener clientes: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                var cliente = lista.FirstOrDefault(c => c.CodigoCliente == codigo);
-
-                if (cliente != null)
-                {
-                    txtQRCliente.Text = cliente.CodigoCliente.ToString();
-                    txtNombreCompleto.Text = cliente.NombreCompleto ?? "";
-                    try
-                    {
-                        presupuestoInicial = Convert.ToDecimal(cliente.Presupuesto);
-                    }
-                    catch
-                    {
-                        presupuestoInicial = 0m;
-                    }
-
-                    clienteSeleccionado = true;
-
-                    if (this.Controls.ContainsKey("txtPresupuesto"))
-                    {
-                        var ctrl = this.Controls["txtPresupuesto"] as TextBox;
-                        if (ctrl != null)
-                        {
-                            ctrl.Text = (-presupuestoInicial).ToString("0.00");
-                        }
-                    }
-
-                    txtTotal.Text = (-presupuestoInicial).ToString("0.00");
-                    totalVenta = 0m;
-
-                    this.ActiveControl = txtCodigo;
-                    txtCodigo.Focus();
-                }
-                else
-                {
-                    txtNombreCompleto.Text = "";
-                    MessageBox.Show($"No se encontró un cliente con el código {codigo}.", "Cliente no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-        }
+        
 
         private void txtCodigo_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter) return;
+            if(txtCodigo.Text == "") return;
+            if (txtQRCliente.Text == "")
+            {
+                MessageBox.Show("Debe seleccionar un cliente antes de agregar productos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             // Evitar el sonido de 'ding' y la repetición de la tecla
             e.Handled = true;
@@ -290,6 +228,7 @@ namespace Capa_Presentacion
         {
             decimal total = 0m;
             int cantidadArticulos = 0;
+            decimal ventaTotal = 0m;
 
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
@@ -303,12 +242,16 @@ namespace Capa_Presentacion
                 cantidadArticulos += cantidad;
             }
 
-            totalVenta = total;
+            
 
             txtCantidadArticulos.Text = cantidadArticulos.ToString();
 
             if (clienteSeleccionado)
             {
+                if(txtQRCliente.Text == "1111")
+                {
+                    Console.WriteLine("asd);");
+                }
                 decimal presupuestoActual = -presupuestoInicial + total;
                 txtTotal.Text = presupuestoActual.ToString("0.00");
             }
@@ -316,6 +259,8 @@ namespace Capa_Presentacion
             {
                 txtTotal.Text = totalVenta.ToString("0.00");
             }
+
+            txtTotalVenta.Text = total.ToString("0.00");
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -461,14 +406,6 @@ namespace Capa_Presentacion
                 }
                 e.Handled = true;
             }
-            if (double.TryParse(txtTotal.Text, out double totalColones))
-            {
-                txtColones.Text = (totalColones * 490).ToString("0");
-            }
-            else
-            {
-                txtColones.Text = "0";
-            }
 
         }
 
@@ -520,7 +457,7 @@ namespace Capa_Presentacion
             {
                 oUsuario = new Usuario() { IdUsuario = _Usuario.IdUsuario },
                 NumeroFact = Convert.ToInt32(NumeroVentaStr),
-                oCliente = new Cliente() {IdCliente = idCliente, CodigoCliente = Convert.ToInt32(txtQRCliente.Text) }, // asignar IdCliente
+                oCliente = new Cliente() {IdCliente = IdClienteSeleccionado, CodigoCliente = Convert.ToInt32(txtQRCliente.Text) }, 
                 NombreCliente = txtNombreCompleto.Text,
                 ModoPago = cmbModoPago.SelectedItem.ToString(),
                 MontoTotal = decimal.TryParse(txtTotal.Text, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out decimal mt) ? mt : 0,
@@ -528,20 +465,44 @@ namespace Capa_Presentacion
             };
 
             string Mensaje = string.Empty;
+            // Registrar la venta primero
             bool respuesta = new CN_Venta().Registrar(oVenta, dtDetalle, out Mensaje);
 
             if (respuesta)
             {
-                MessageBox.Show("Venta registrada correctamente " + NumeroVentaStr, "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Calcular el nuevo presupuesto (disponible)
+                // txtTotal muestra: -PresupuestoActual + GastosVenta
+                // Si txtTotal es 0, significa que se gastó exactamente el presupuesto.
+                decimal resultadoCalculado = 0m;
+                decimal.TryParse(txtTotal.Text, out resultadoCalculado);
+                
+                decimal nuevoPresupuesto;
+                if (resultadoCalculado >= 0)
+                {
+                    // Si el resultado es 0 o positivo (deuda), el presupuesto disponible queda en 0
+                    nuevoPresupuesto = 0m;
+                }
+                else
+                {
+                    // Si el resultado es negativo (ej: -40), significa que sobran 40 de presupuesto
+                    nuevoPresupuesto = Math.Abs(resultadoCalculado);
+                }
+
+                string mensajePresupuesto = string.Empty;
+                // Se actualiza el campo 'Presupuesto' (saldo actual) en la base de datos
+                new CN_Cliente().ActualizarPresupuesto(IdClienteSeleccionado, nuevoPresupuesto, out mensajePresupuesto);
+
+                MessageBox.Show("Venta registrada correctamente", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
                 txtQRCliente.Text = "";
                 txtNombreCompleto.Text = "";
-                txtColones.Text = "";
                 txtTotal.Text = "";
                 dataGridView1.Rows.Clear();
 
                 presupuestoInicial = 0m;
                 clienteSeleccionado = false;
                 totalVenta = 0m;
+                IdClienteSeleccionado = 0;
                 if (this.Controls.ContainsKey("txtPresupuesto"))
                 {
                     var ctrl = this.Controls["txtPresupuesto"] as TextBox;
@@ -549,8 +510,8 @@ namespace Capa_Presentacion
                 }
 
                 // Mover el cursor (focus) automáticamente a txtQRCliente
-                this.ActiveControl = txtQRCliente;   // asegura que el control del formulario sea txtQRCliente
-                txtQRCliente.Focus();                // pone el foco en el TextBox
+                this.ActiveControl = txtQRCliente;   
+                txtQRCliente.Focus();                
 
             }
             else
@@ -558,40 +519,7 @@ namespace Capa_Presentacion
                 MessageBox.Show(Mensaje, "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-        private void LogDetalleVenta(DataTable dt)
-        {
-            Debug.WriteLine("---- DetalleVenta SCHEMA ----");
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
-                var c = dt.Columns[i];
-                Debug.WriteLine($"Col[{i}] Name: '{c.ColumnName}', Type: {c.DataType}, AllowDBNull: {c.AllowDBNull}");
-            }
-
-            Debug.WriteLine("---- DetalleVenta FILAS (hasta 20) ----");
-            int rowCount = 0;
-            foreach (DataRow r in dt.Rows)
-            {
-                if (rowCount++ >= 20) break;
-                var vals = dt.Columns.Cast<DataColumn>().Select(c =>
-                {
-                    if (r.IsNull(c)) return "<NULL>";
-                    var v = r[c];
-                    return $"{v} (CLR:{v.GetType().Name})";
-                });
-                Debug.WriteLine($"Fila {rowCount}: {string.Join(" | ", vals)}");
-            }
-        }
-        private void ValidarSchemaDetalle(DataTable dt)
-        {
-            if (dt == null) throw new ArgumentNullException(nameof(dt));
-            if (dt.Columns.Count != 5) throw new ArgumentException("DetalleVenta: columnas inválidas");
-
-            if (dt.Columns[0].ColumnName != "IdInventario" || dt.Columns[0].DataType != typeof(int)) throw new ArgumentException("Columna 0 inválida");
-            if (dt.Columns[1].ColumnName != "Precio" || dt.Columns[1].DataType != typeof(decimal)) throw new ArgumentException("Columna 1 inválida");
-            if (dt.Columns[2].ColumnName != "Detalle" || dt.Columns[2].DataType != typeof(string)) throw new ArgumentException("Columna 2 inválida");
-            if (dt.Columns[3].ColumnName != "Cantidad" || dt.Columns[3].DataType != typeof(int)) throw new ArgumentException("Columna 3 inválida");
-            if (dt.Columns[4].ColumnName != "MontoTotal" || dt.Columns[4].DataType != typeof(decimal)) throw new ArgumentException("Columna 4 inválida");
-        }
+        
 
         private void iconButton4_Click(object sender, EventArgs e)
         {
@@ -601,9 +529,9 @@ namespace Capa_Presentacion
             // Limpiar campos y grid
             txtQRCliente.Text = "";
             txtNombreCompleto.Text = "";
-            txtColones.Text = "";
             txtTotal.Text = "";
             txtCantidadArticulos.Text = "";
+            txtTotalVenta.Text = "";
             dataGridView1.Rows.Clear();
 
             // Restaurar modo de pago por defecto si existe
@@ -620,6 +548,77 @@ namespace Capa_Presentacion
             txtQRCliente.Focus();
         }
 
+        private void txtQRCliente_TextChanged(object sender, EventArgs e)
+        {
+            dataGridView1.Rows.Clear();
+            if (txtQRCliente.TextLength >= 4)
+            {
+                 
+                var input = txtQRCliente.Text?.Trim() ?? "";
 
+                if (string.IsNullOrEmpty(input))
+                {
+                    MessageBox.Show("Ingrese un código de cliente.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!int.TryParse(input, out int codigo))
+                {
+                    MessageBox.Show("El código debe ser un número válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Buscar cliente por código usando la lista actual. Mejor crear un método específico en CN_Cliente si la lista es grande.
+                List<Cliente> lista;
+                try
+                {
+                    lista = new CN_Cliente().Listar();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al obtener clientes: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var cliente = lista.FirstOrDefault(c => c.CodigoCliente == codigo);
+
+                if (cliente != null)
+                {
+                    txtQRCliente.Text = cliente.CodigoCliente.ToString();
+                    txtNombreCompleto.Text = cliente.NombreCompleto ?? "";
+                    try
+                    {
+                        presupuestoInicial = Convert.ToDecimal(cliente.Presupuesto);
+                    }
+                    catch
+                    {
+                        presupuestoInicial = 0m;
+                    }
+
+                    clienteSeleccionado = true;
+                    IdClienteSeleccionado = cliente.IdCliente;
+
+                    if (this.Controls.ContainsKey("txtPresupuesto"))
+                    {
+                        var ctrl = this.Controls["txtPresupuesto"] as TextBox;
+                        if (ctrl != null)
+                        {
+                            ctrl.Text = (-presupuestoInicial).ToString("0.00");
+                        }
+                    }
+
+                    txtTotal.Text = (-presupuestoInicial).ToString("0.00");
+                    totalVenta = 0m;
+
+                    this.ActiveControl = txtCodigo;
+                    txtCodigo.Focus();
+                }
+                else
+                {
+                    txtNombreCompleto.Text = "";
+                    MessageBox.Show($"No se encontró un cliente con el código {codigo}.", "Cliente no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
     }
 }

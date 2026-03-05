@@ -31,11 +31,8 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.label4 = new System.Windows.Forms.Label();
-            this.cmbBoxGuardar = new System.Windows.Forms.ComboBox();
             this.label9 = new System.Windows.Forms.Label();
             this.txtbusqueda = new System.Windows.Forms.TextBox();
-            this.limpiarBuscar = new FontAwesome.Sharp.IconButton();
-            this.buscar = new FontAwesome.Sharp.IconButton();
             this.txtCodigoCliente = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.txtId = new System.Windows.Forms.TextBox();
@@ -53,12 +50,16 @@
             this.dataGridCliente = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.txtNombreCompleto = new System.Windows.Forms.TextBox();
+            this.txtPresupuestoInicial = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.dsa = new System.Windows.Forms.DataGridViewButtonColumn();
             this.IdCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Codigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.CodigoCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.NombreCompleto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Correo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PresupuestoInicial = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Presupuesto = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FechaRegistro = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridCliente)).BeginInit();
             this.SuspendLayout();
             // 
@@ -73,22 +74,11 @@
             this.label4.TabIndex = 27;
             this.label4.Text = "Rol";
             // 
-            // cmbBoxGuardar
-            // 
-            this.cmbBoxGuardar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbBoxGuardar.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmbBoxGuardar.FormattingEnabled = true;
-            this.cmbBoxGuardar.Location = new System.Drawing.Point(991, 83);
-            this.cmbBoxGuardar.Margin = new System.Windows.Forms.Padding(4);
-            this.cmbBoxGuardar.Name = "cmbBoxGuardar";
-            this.cmbBoxGuardar.Size = new System.Drawing.Size(165, 28);
-            this.cmbBoxGuardar.TabIndex = 65;
-            // 
             // label9
             // 
             this.label9.BackColor = System.Drawing.Color.WhiteSmoke;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(1163, 83);
+            this.label9.Location = new System.Drawing.Point(1141, 87);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(79, 23);
             this.label9.TabIndex = 64;
@@ -97,41 +87,16 @@
             // txtbusqueda
             // 
             this.txtbusqueda.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtbusqueda.Location = new System.Drawing.Point(1248, 83);
+            this.txtbusqueda.Location = new System.Drawing.Point(1226, 84);
             this.txtbusqueda.Name = "txtbusqueda";
             this.txtbusqueda.Size = new System.Drawing.Size(160, 27);
             this.txtbusqueda.TabIndex = 63;
-            // 
-            // limpiarBuscar
-            // 
-            this.limpiarBuscar.IconChar = FontAwesome.Sharp.IconChar.Broom;
-            this.limpiarBuscar.IconColor = System.Drawing.Color.Black;
-            this.limpiarBuscar.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.limpiarBuscar.IconSize = 23;
-            this.limpiarBuscar.Location = new System.Drawing.Point(1461, 83);
-            this.limpiarBuscar.Name = "limpiarBuscar";
-            this.limpiarBuscar.Size = new System.Drawing.Size(41, 29);
-            this.limpiarBuscar.TabIndex = 62;
-            this.limpiarBuscar.UseVisualStyleBackColor = true;
-            this.limpiarBuscar.Click += new System.EventHandler(this.limpiarBuscar_Click);
-            // 
-            // buscar
-            // 
-            this.buscar.IconChar = FontAwesome.Sharp.IconChar.Search;
-            this.buscar.IconColor = System.Drawing.Color.Black;
-            this.buscar.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.buscar.IconSize = 23;
-            this.buscar.Location = new System.Drawing.Point(1414, 83);
-            this.buscar.Name = "buscar";
-            this.buscar.Size = new System.Drawing.Size(41, 29);
-            this.buscar.TabIndex = 61;
-            this.buscar.UseVisualStyleBackColor = true;
-            this.buscar.Click += new System.EventHandler(this.buscar_Click);
+            this.txtbusqueda.TextChanged += new System.EventHandler(this.txtbusqueda_TextChanged);
             // 
             // txtCodigoCliente
             // 
             this.txtCodigoCliente.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCodigoCliente.Location = new System.Drawing.Point(28, 325);
+            this.txtCodigoCliente.Location = new System.Drawing.Point(27, 268);
             this.txtCodigoCliente.Margin = new System.Windows.Forms.Padding(4);
             this.txtCodigoCliente.Name = "txtCodigoCliente";
             this.txtCodigoCliente.Size = new System.Drawing.Size(301, 23);
@@ -141,7 +106,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(24, 292);
+            this.label7.Location = new System.Drawing.Point(26, 246);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(56, 18);
@@ -184,10 +149,10 @@
             this.iconButton3.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconButton3.IconSize = 30;
             this.iconButton3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.iconButton3.Location = new System.Drawing.Point(19, 695);
+            this.iconButton3.Location = new System.Drawing.Point(105, 621);
             this.iconButton3.Margin = new System.Windows.Forms.Padding(4);
             this.iconButton3.Name = "iconButton3";
-            this.iconButton3.Size = new System.Drawing.Size(172, 43);
+            this.iconButton3.Size = new System.Drawing.Size(171, 33);
             this.iconButton3.TabIndex = 51;
             this.iconButton3.Text = "Eliminar";
             this.iconButton3.UseVisualStyleBackColor = true;
@@ -201,13 +166,14 @@
             this.btnLimpiar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnLimpiar.IconSize = 30;
             this.btnLimpiar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLimpiar.Location = new System.Drawing.Point(19, 643);
+            this.btnLimpiar.Location = new System.Drawing.Point(105, 580);
             this.btnLimpiar.Margin = new System.Windows.Forms.Padding(4);
             this.btnLimpiar.Name = "btnLimpiar";
-            this.btnLimpiar.Size = new System.Drawing.Size(172, 43);
+            this.btnLimpiar.Size = new System.Drawing.Size(171, 33);
             this.btnLimpiar.TabIndex = 50;
             this.btnLimpiar.Text = "Limpiar";
             this.btnLimpiar.UseVisualStyleBackColor = true;
+            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click);
             // 
             // frmInicioGuardar
             // 
@@ -217,10 +183,10 @@
             this.frmInicioGuardar.IconFont = FontAwesome.Sharp.IconFont.Solid;
             this.frmInicioGuardar.IconSize = 30;
             this.frmInicioGuardar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.frmInicioGuardar.Location = new System.Drawing.Point(19, 592);
+            this.frmInicioGuardar.Location = new System.Drawing.Point(105, 539);
             this.frmInicioGuardar.Margin = new System.Windows.Forms.Padding(4);
             this.frmInicioGuardar.Name = "frmInicioGuardar";
-            this.frmInicioGuardar.Size = new System.Drawing.Size(172, 43);
+            this.frmInicioGuardar.Size = new System.Drawing.Size(171, 33);
             this.frmInicioGuardar.TabIndex = 49;
             this.frmInicioGuardar.Text = "Guardar";
             this.frmInicioGuardar.UseVisualStyleBackColor = true;
@@ -229,7 +195,7 @@
             // txtPresupuesto
             // 
             this.txtPresupuesto.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPresupuesto.Location = new System.Drawing.Point(28, 498);
+            this.txtPresupuesto.Location = new System.Drawing.Point(28, 423);
             this.txtPresupuesto.Margin = new System.Windows.Forms.Padding(4);
             this.txtPresupuesto.Name = "txtPresupuesto";
             this.txtPresupuesto.Size = new System.Drawing.Size(301, 23);
@@ -238,7 +204,7 @@
             // txtCorreo
             // 
             this.txtCorreo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCorreo.Location = new System.Drawing.Point(28, 416);
+            this.txtCorreo.Location = new System.Drawing.Point(30, 349);
             this.txtCorreo.Margin = new System.Windows.Forms.Padding(4);
             this.txtCorreo.Name = "txtCorreo";
             this.txtCorreo.Size = new System.Drawing.Size(301, 23);
@@ -248,7 +214,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(26, 460);
+            this.label2.Location = new System.Drawing.Point(27, 389);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(92, 18);
@@ -259,7 +225,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(25, 378);
+            this.label6.Location = new System.Drawing.Point(27, 314);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(55, 18);
@@ -281,7 +247,7 @@
             this.label8.BackColor = System.Drawing.Color.WhiteSmoke;
             this.label8.Location = new System.Drawing.Point(366, 65);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(1158, 60);
+            this.label8.Size = new System.Drawing.Size(1042, 60);
             this.label8.TabIndex = 60;
             // 
             // dataGridCliente
@@ -301,18 +267,20 @@
             this.dataGridCliente.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dsa,
             this.IdCliente,
-            this.Codigo,
+            this.CodigoCliente,
             this.NombreCompleto,
             this.Correo,
-            this.Presupuesto});
-            this.dataGridCliente.Location = new System.Drawing.Point(368, 143);
+            this.PresupuestoInicial,
+            this.Presupuesto,
+            this.FechaRegistro});
+            this.dataGridCliente.Location = new System.Drawing.Point(372, 139);
             this.dataGridCliente.MultiSelect = false;
             this.dataGridCliente.Name = "dataGridCliente";
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.White;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
             this.dataGridCliente.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridCliente.RowTemplate.Height = 28;
-            this.dataGridCliente.Size = new System.Drawing.Size(1155, 678);
+            this.dataGridCliente.Size = new System.Drawing.Size(1036, 503);
             this.dataGridCliente.TabIndex = 53;
             this.dataGridCliente.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridCliente_CellContentClick);
             this.dataGridCliente.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridCliente_CellPainting);
@@ -321,7 +289,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(25, 199);
+            this.label1.Location = new System.Drawing.Point(24, 165);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(131, 18);
@@ -332,11 +300,31 @@
             // txtNombreCompleto
             // 
             this.txtNombreCompleto.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtNombreCompleto.Location = new System.Drawing.Point(27, 238);
+            this.txtNombreCompleto.Location = new System.Drawing.Point(27, 203);
             this.txtNombreCompleto.Margin = new System.Windows.Forms.Padding(4);
             this.txtNombreCompleto.Name = "txtNombreCompleto";
             this.txtNombreCompleto.Size = new System.Drawing.Size(301, 23);
             this.txtNombreCompleto.TabIndex = 67;
+            // 
+            // txtPresupuestoInicial
+            // 
+            this.txtPresupuestoInicial.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPresupuestoInicial.Location = new System.Drawing.Point(29, 498);
+            this.txtPresupuestoInicial.Margin = new System.Windows.Forms.Padding(4);
+            this.txtPresupuestoInicial.Name = "txtPresupuestoInicial";
+            this.txtPresupuestoInicial.Size = new System.Drawing.Size(301, 23);
+            this.txtPresupuestoInicial.TabIndex = 68;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(27, 464);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(132, 18);
+            this.label3.TabIndex = 69;
+            this.label3.Text = "Presupuesto Inicial";
             // 
             // dsa
             // 
@@ -346,33 +334,52 @@
             // 
             // IdCliente
             // 
+            this.IdCliente.DataPropertyName = "IdCliente";
             this.IdCliente.HeaderText = "IdCliente";
             this.IdCliente.Name = "IdCliente";
             this.IdCliente.Visible = false;
             // 
-            // Codigo
+            // CodigoCliente
             // 
-            this.Codigo.HeaderText = "Codigo";
-            this.Codigo.Name = "Codigo";
-            this.Codigo.Width = 150;
+            this.CodigoCliente.DataPropertyName = "CodigoCliente";
+            this.CodigoCliente.HeaderText = "Codigo";
+            this.CodigoCliente.Name = "CodigoCliente";
+            this.CodigoCliente.Width = 150;
             // 
             // NombreCompleto
             // 
             this.NombreCompleto.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.NombreCompleto.DataPropertyName = "NombreCompleto";
             this.NombreCompleto.HeaderText = "Nombre Completo";
             this.NombreCompleto.Name = "NombreCompleto";
             // 
             // Correo
             // 
             this.Correo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Correo.DataPropertyName = "Correo";
             this.Correo.HeaderText = "Correo";
             this.Correo.Name = "Correo";
             // 
+            // PresupuestoInicial
+            // 
+            this.PresupuestoInicial.DataPropertyName = "PresupuestoInicial";
+            this.PresupuestoInicial.HeaderText = "Presupuesto Inicial";
+            this.PresupuestoInicial.Name = "PresupuestoInicial";
+            this.PresupuestoInicial.Width = 150;
+            // 
             // Presupuesto
             // 
+            this.Presupuesto.DataPropertyName = "Presupuesto";
             this.Presupuesto.HeaderText = "Presupuesto";
             this.Presupuesto.Name = "Presupuesto";
             this.Presupuesto.Width = 150;
+            // 
+            // FechaRegistro
+            // 
+            this.FechaRegistro.DataPropertyName = "FechaRegistro";
+            this.FechaRegistro.HeaderText = "FechaRegistro";
+            this.FechaRegistro.Name = "FechaRegistro";
+            this.FechaRegistro.Visible = false;
             // 
             // frmClientes
             // 
@@ -380,13 +387,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1552, 874);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.txtPresupuestoInicial);
             this.Controls.Add(this.txtNombreCompleto);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.cmbBoxGuardar);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.txtbusqueda);
-            this.Controls.Add(this.limpiarBuscar);
-            this.Controls.Add(this.buscar);
             this.Controls.Add(this.txtCodigoCliente);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.txtId);
@@ -415,11 +421,8 @@
         #endregion
 
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ComboBox cmbBoxGuardar;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox txtbusqueda;
-        private FontAwesome.Sharp.IconButton limpiarBuscar;
-        private FontAwesome.Sharp.IconButton buscar;
         private System.Windows.Forms.TextBox txtCodigoCliente;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox txtId;
@@ -437,11 +440,15 @@
         private System.Windows.Forms.DataGridView dataGridCliente;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtNombreCompleto;
+        private System.Windows.Forms.TextBox txtPresupuestoInicial;
+        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridViewButtonColumn dsa;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdCliente;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Codigo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CodigoCliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn NombreCompleto;
         private System.Windows.Forms.DataGridViewTextBoxColumn Correo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PresupuestoInicial;
         private System.Windows.Forms.DataGridViewTextBoxColumn Presupuesto;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FechaRegistro;
     }
 }

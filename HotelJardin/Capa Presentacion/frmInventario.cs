@@ -23,39 +23,20 @@ namespace Capa_Presentacion
             InitializeComponent();
         }
 
+        private List<Inventario> listaInventario = new List<Inventario>();
+
+        private void cargarGrid()
+        {
+            listaInventario = new CN_Inventario().Listar();
+            dataGridInventario.DataSource = listaInventario;
+        }
+
         private void frmInventario_Load(object sender, EventArgs e)
         {
 
-            //Mostrar opciones en cbmBoxguardar
-            foreach (DataGridViewColumn columna in dataGridInventario.Columns)
-            {
-                if (columna.Visible == true && columna.Name != "btnSelecionar")
-                {
-                    cmbBoxGuardar.Items.Add(new OpcionCombo() { Valor = columna.Name, Texto = columna.HeaderText });
-                }
-            }
-            cmbBoxGuardar.DisplayMember = "Texto";
-            cmbBoxGuardar.ValueMember = "Value";
-            cmbBoxGuardar.SelectedIndex = 2;
+            cargarGrid();
 
 
-
-            //Mostrar usuarios en el datagridview
-            List<Inventario> lista = new CN_Inventario().Listar();
-
-
-            foreach (Inventario item in lista)
-            {
-                dataGridInventario.Rows.Add(new object[] {
-                "",
-                item.IdInventario,
-                item.Codigo,
-                item.Descripcion,
-                item.Proveedor,
-                item.Cantidad,
-                item.Precio
-                });
-            }
         }
 
         private void frmInicioGuardar_Click(object sender, EventArgs e)
@@ -82,16 +63,8 @@ namespace Capa_Presentacion
 
                     if (IdProductoGenerado != 0)
                     {
-                        dataGridInventario.Rows.Add(new object[] {
-                    "",
-                    IdProductoGenerado,
-                    txtInventarioCodigo.Text,
-                    txtInventarioDescripcion.Text,
-                    txtInventarioProveedor.Text,
-                    txtInventarioCantidad.Text,
-                    txtInventarioPrecio.Text
-                    });
                         Limpiar();
+                        cargarGrid();
                     }
                     else
                     {
@@ -120,6 +93,7 @@ namespace Capa_Presentacion
                             rowEncontrada.Cells["Cantidad"].Value = txtInventarioCantidad.Text;
                             rowEncontrada.Cells["Precio"].Value = txtInventarioPrecio.Text;
                         }
+                        cargarGrid();
                         Limpiar();
 
 
@@ -129,6 +103,7 @@ namespace Capa_Presentacion
                         MessageBox.Show(Mensaje);
                     }
                 }
+                cargarGrid();
             }
             catch (Exception ex)
             {
@@ -143,6 +118,7 @@ namespace Capa_Presentacion
             txtInventarioProveedor.Text = "";
             txtInventarioCantidad.Text = "";
             txtInventarioPrecio.Text = "";
+            txtId.Text = "0";
         }
 
         private void dataGridInventario_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
@@ -194,28 +170,8 @@ namespace Capa_Presentacion
                     bool resultado = new CN_Inventario().Eliminar(objInventario, out Mensaje);
                     if (resultado)
                     {
-                        // Buscar la fila correspondiente por IdUsuario (valor de BD)
-                        int idInventario = objInventario.IdInventario;
-                        DataGridViewRow rowEncontrada = null;
-                        foreach (DataGridViewRow r in dataGridInventario.Rows)
-                        {
-                            if (r.Cells["IdInventario"].Value != null &&
-                                int.TryParse(r.Cells["IdInventario"].Value.ToString(), out int idCell) &&
-                                idCell == idInventario)
-                            {
-                                rowEncontrada = r;
-                                break;
-                            }
-                        }
-                        if (rowEncontrada != null)
-                        {
-                            dataGridInventario.Rows.Remove(rowEncontrada);
-                            Limpiar();
-                        }
-                        else
-                        {
-                            MessageBox.Show("No se encontró la fila correspondiente al Articulo eliminado.");
-                        }
+                        cargarGrid();
+                        Limpiar();
                     }
                     else
                     {
@@ -233,41 +189,6 @@ namespace Capa_Presentacion
             }
         }
 
-        private void buscar_Click(object sender, EventArgs e)
-        {
-            string columnaFiltro = ((OpcionCombo)cmbBoxGuardar.SelectedItem).Valor.ToString();
-            string search = txtbusqueda.Text?.Trim() ?? "";
-
-            if (string.IsNullOrEmpty(search))
-            {
-                // optionally show all rows
-                foreach (DataGridViewRow row in dataGridInventario.Rows)
-                    row.Visible = true;
-                return;
-            }
-
-            foreach (DataGridViewRow row in dataGridInventario.Rows)
-            {
-                if (row.IsNewRow) continue; // skip the 'new' row if present
-
-                string cellText = Convert.ToString(row.Cells[columnaFiltro].Value); // safe for null
-                bool match = cellText.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0;
-
-                row.Visible = match;
-            }
-
-
-        }
-
-        private void limpiarBuscar_Click(object sender, EventArgs e)
-        {
-            //Limpiar busqueda
-            txtbusqueda.Text = "";
-            foreach (DataGridViewRow row in dataGridInventario.Rows)
-            {
-                row.Visible = true;
-            }
-        }
 
         private void dataGridInventario_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -284,6 +205,20 @@ namespace Capa_Presentacion
                     txtInventarioCantidad.Text = dataGridInventario.Rows[indice].Cells["Cantidad"].Value.ToString();
                     txtInventarioPrecio.Text = dataGridInventario.Rows[indice].Cells["Precio"].Value.ToString();
                 }
+            }
+        }
+
+        private void txtbusqueda_TextChanged(object sender, EventArgs e)
+        {
+            if (txtbusqueda.TextLength >= 3)
+            {
+                var busqueda = txtbusqueda.Text.ToLower();
+                var listaFiltrada = listaInventario.Where(i => i.Descripcion.ToLower().Contains(busqueda) || i.Proveedor.ToLower().Contains(busqueda)).ToList();
+                dataGridInventario.DataSource = listaFiltrada;
+            }
+            else
+            {
+                dataGridInventario.DataSource = listaInventario;
             }
         }
     }

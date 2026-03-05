@@ -41,6 +41,8 @@
             this.NombreCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ModoPago = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.MontoTotal = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PresupuestoGastado = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Extra = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnExportarExcel = new FontAwesome.Sharp.IconButton();
             this.iconButton2 = new FontAwesome.Sharp.IconButton();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewReporte)).BeginInit();
@@ -114,10 +116,12 @@
             this.IdVenta,
             this.NombreCliente,
             this.ModoPago,
-            this.MontoTotal});
-            this.dataGridViewReporte.Location = new System.Drawing.Point(473, 100);
+            this.MontoTotal,
+            this.PresupuestoGastado,
+            this.Extra});
+            this.dataGridViewReporte.Location = new System.Drawing.Point(427, 100);
             this.dataGridViewReporte.Name = "dataGridViewReporte";
-            this.dataGridViewReporte.Size = new System.Drawing.Size(759, 406);
+            this.dataGridViewReporte.Size = new System.Drawing.Size(861, 406);
             this.dataGridViewReporte.TabIndex = 6;
             // 
             // FechaRegistro
@@ -155,6 +159,17 @@
             this.MontoTotal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.MontoTotal.HeaderText = "Monto Total";
             this.MontoTotal.Name = "MontoTotal";
+            // 
+            // PresupuestoGastado
+            // 
+            this.PresupuestoGastado.HeaderText = "PresupuestoGastado";
+            this.PresupuestoGastado.Name = "PresupuestoGastado";
+            this.PresupuestoGastado.Width = 150;
+            // 
+            // Extra
+            // 
+            this.Extra.HeaderText = "Extra";
+            this.Extra.Name = "Extra";
             // 
             // btnExportarExcel
             // 
@@ -220,13 +235,15 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.DataGridView dataGridViewReporte;
+        private FontAwesome.Sharp.IconButton btnExportarExcel;
+        private FontAwesome.Sharp.IconButton iconButton2;
         private System.Windows.Forms.DataGridViewTextBoxColumn FechaRegistro;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdUsuario;
         private System.Windows.Forms.DataGridViewTextBoxColumn IdVenta;
         private System.Windows.Forms.DataGridViewTextBoxColumn NombreCliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn ModoPago;
         private System.Windows.Forms.DataGridViewTextBoxColumn MontoTotal;
-        private FontAwesome.Sharp.IconButton btnExportarExcel;
-        private FontAwesome.Sharp.IconButton iconButton2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn PresupuestoGastado;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Extra;
     }
 }

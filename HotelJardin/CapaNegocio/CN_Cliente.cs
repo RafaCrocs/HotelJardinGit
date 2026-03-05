@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CapaEntidad;
-using CapaDatos;
 
 namespace CapaNegocio
 {
@@ -65,6 +63,11 @@ namespace CapaNegocio
         public bool Eliminar(Cliente obj, out string Mensaje)
         {
             return objcd_Cliente.Eliminar(obj, out Mensaje);
+        }
+
+        public bool ActualizarPresupuesto(int idCliente, decimal nuevoPresupuesto, out string Mensaje)
+        {
+            return objcd_Cliente.ActualizarPresupuesto(idCliente, nuevoPresupuesto, out Mensaje);
         }
 
 

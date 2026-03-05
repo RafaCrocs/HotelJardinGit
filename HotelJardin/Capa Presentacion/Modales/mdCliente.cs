@@ -25,38 +25,17 @@ namespace Capa_Presentacion.Modales
             InitializeComponent();
         }
 
+        private List<Cliente> clientes = new List<Cliente>();
+
+        private void cargarGrid()
+        {
+            clientes = new CN_Cliente().Listar();
+            dataGridCliente.DataSource = clientes;
+
+        }
         private void mdCliente_Load(object sender, EventArgs e)
         {
-            foreach (DataGridViewColumn columna in dataGridCliente.Columns)
-            {
-                if (columna.Visible == true && columna.Name != "btnSelecionar")
-                {
-                    cmbBoxGuardar.Items.Add(new OpcionCombo() { Valor = columna.Name, Texto = columna.HeaderText });
-                }
-            }
-            cmbBoxGuardar.DisplayMember = "Texto";
-            cmbBoxGuardar.ValueMember = "Value";
-            cmbBoxGuardar.SelectedIndex = 2;
-
-            List<Cliente> lista = new CN_Cliente().Listar();
-
-
-            foreach (Cliente item in lista)
-            {
-                dataGridCliente.Rows.Add(new object[] {
-                "",
-                item.IdCliente,
-                item.CodigoCliente,
-                item.NombreCompleto,
-                item.Correo,
-                item.Presupuesto,
-                });
-            }
-
-
-
-
-
+            cargarGrid();
         }
 
         private void dataGridCliente_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -67,35 +46,33 @@ namespace Capa_Presentacion.Modales
             {
                 _Cliente = new Cliente()
                 {
+                    IdCliente = Convert.ToInt32(dataGridCliente.Rows[iRow].Cells["IdCliente"].Value),
                     CodigoCliente = Convert.ToInt32(dataGridCliente.Rows[iRow].Cells["Codigo"].Value),
-                    NombreCompleto = dataGridCliente.Rows[iRow].Cells["NombreCompleto"].Value.ToString()
+                    NombreCompleto = dataGridCliente.Rows[iRow].Cells["NombreCompleto"].Value.ToString(),
+                    Presupuesto = Convert.ToDecimal(dataGridCliente.Rows[iRow].Cells["Presupuesto"].Value)
                 };
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
         }
 
-        private void iconButton1_Click(object sender, EventArgs e)
+        
+
+        private void cmbBoxGuardar_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string columnaFiltro = ((OpcionCombo)cmbBoxGuardar.SelectedItem).Valor.ToString();
-            string search = txtbusqueda.Text?.Trim() ?? "";
 
-            if (string.IsNullOrEmpty(search))
+        }
+
+        private void txtbusqueda_TextChanged(object sender, EventArgs e)
+        {
+            if(txtbusqueda.TextLength >= 3)
             {
-                // optionally show all rows
-                foreach (DataGridViewRow row in dataGridCliente.Rows)
-                    row.Visible = true;
-                return;
+                var listaFiltrada = clientes.Where(x => x.NombreCompleto.ToLower().Contains(txtbusqueda.Text.ToLower()) || x.CodigoCliente.ToString().Contains(txtbusqueda.Text)).ToList();
+                dataGridCliente.DataSource = listaFiltrada;
             }
-
-            foreach (DataGridViewRow row in dataGridCliente.Rows)
+            else
             {
-                if (row.IsNewRow) continue; // skip the 'new' row if present
-
-                string cellText = Convert.ToString(row.Cells[columnaFiltro].Value); // safe for null
-                bool match = cellText.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0;
-
-                row.Visible = match;
+                dataGridCliente.DataSource = clientes;
             }
         }
     }

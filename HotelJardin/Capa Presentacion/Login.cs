@@ -40,7 +40,7 @@ namespace Capa_Presentacion
         }
         private void btnLoginSalir_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Application.Exit();
         }
 
         private void checkBoxContra_CheckedChanged(object sender, EventArgs e)

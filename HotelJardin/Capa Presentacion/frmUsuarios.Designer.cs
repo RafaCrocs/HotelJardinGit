@@ -135,7 +135,7 @@
             this.frmInicioGuardar.IconFont = FontAwesome.Sharp.IconFont.Solid;
             this.frmInicioGuardar.IconSize = 30;
             this.frmInicioGuardar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.frmInicioGuardar.Location = new System.Drawing.Point(16, 421);
+            this.frmInicioGuardar.Location = new System.Drawing.Point(11, 378);
             this.frmInicioGuardar.Margin = new System.Windows.Forms.Padding(4);
             this.frmInicioGuardar.Name = "frmInicioGuardar";
             this.frmInicioGuardar.Size = new System.Drawing.Size(172, 43);
@@ -152,7 +152,7 @@
             this.btnLimpiar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnLimpiar.IconSize = 30;
             this.btnLimpiar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLimpiar.Location = new System.Drawing.Point(16, 472);
+            this.btnLimpiar.Location = new System.Drawing.Point(11, 429);
             this.btnLimpiar.Margin = new System.Windows.Forms.Padding(4);
             this.btnLimpiar.Name = "btnLimpiar";
             this.btnLimpiar.Size = new System.Drawing.Size(172, 43);
@@ -169,7 +169,7 @@
             this.iconButton3.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconButton3.IconSize = 30;
             this.iconButton3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.iconButton3.Location = new System.Drawing.Point(16, 524);
+            this.iconButton3.Location = new System.Drawing.Point(11, 480);
             this.iconButton3.Margin = new System.Windows.Forms.Padding(4);
             this.iconButton3.Name = "iconButton3";
             this.iconButton3.Size = new System.Drawing.Size(172, 43);
@@ -183,7 +183,7 @@
             this.cmbboxRol.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbboxRol.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbboxRol.FormattingEnabled = true;
-            this.cmbboxRol.Location = new System.Drawing.Point(13, 365);
+            this.cmbboxRol.Location = new System.Drawing.Point(13, 346);
             this.cmbboxRol.Margin = new System.Windows.Forms.Padding(4);
             this.cmbboxRol.Name = "cmbboxRol";
             this.cmbboxRol.Size = new System.Drawing.Size(301, 24);
@@ -193,7 +193,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(13, 343);
+            this.label4.Location = new System.Drawing.Point(13, 324);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(31, 18);
@@ -238,7 +238,7 @@
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(892, 483);
+            this.dataGridView1.Size = new System.Drawing.Size(722, 370);
             this.dataGridView1.TabIndex = 13;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridView1_CellPainting);
@@ -285,7 +285,7 @@
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.Location = new System.Drawing.Point(376, 65);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(892, 51);
+            this.label5.Size = new System.Drawing.Size(722, 51);
             this.label5.TabIndex = 14;
             this.label5.Text = "Lista de Usuarios";
             // 

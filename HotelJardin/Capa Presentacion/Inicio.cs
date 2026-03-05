@@ -104,9 +104,6 @@ namespace Capa_Presentacion
             AbrirFormulario((IconMenuItem)sender, new frmReporte());
         }
 
-        private void MenuConfiguracion_Click(object sender, EventArgs e)
-        {
-            AbrirFormulario((IconMenuItem)sender, new frmConfiguraciones());
-        }
+        
     }
 }
