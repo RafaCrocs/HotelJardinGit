@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
             this.lblLogin1 = new System.Windows.Forms.Label();
             this.panelLogin = new System.Windows.Forms.Panel();
+            this.iconButton1 = new FontAwesome.Sharp.IconButton();
+            this.txtCadenaConexion = new System.Windows.Forms.TextBox();
             this.btnLoginIngresar = new FontAwesome.Sharp.IconButton();
             this.btnLoginSalir = new FontAwesome.Sharp.IconButton();
             this.checkBoxContra = new System.Windows.Forms.CheckBox();
@@ -38,8 +40,8 @@
             this.txtLoginUsuario = new System.Windows.Forms.TextBox();
             this.lblLoginUsu = new System.Windows.Forms.Label();
             this.lblLoginContra = new System.Windows.Forms.Label();
-            this.lblIniciodeSesion = new System.Windows.Forms.Label();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.lblIniciodeSesion = new System.Windows.Forms.Label();
             this.lblLoginUsuario = new System.Windows.Forms.Label();
             this.panelLogin.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
@@ -59,6 +61,8 @@
             // panelLogin
             // 
             this.panelLogin.BackColor = System.Drawing.Color.Beige;
+            this.panelLogin.Controls.Add(this.iconButton1);
+            this.panelLogin.Controls.Add(this.txtCadenaConexion);
             this.panelLogin.Controls.Add(this.btnLoginIngresar);
             this.panelLogin.Controls.Add(this.btnLoginSalir);
             this.panelLogin.Controls.Add(this.checkBoxContra);
@@ -72,6 +76,33 @@
             this.panelLogin.Name = "panelLogin";
             this.panelLogin.Size = new System.Drawing.Size(534, 450);
             this.panelLogin.TabIndex = 3;
+            // 
+            // iconButton1
+            // 
+            this.iconButton1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.iconButton1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.iconButton1.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.iconButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.iconButton1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.iconButton1.IconChar = FontAwesome.Sharp.IconChar.None;
+            this.iconButton1.IconColor = System.Drawing.Color.Black;
+            this.iconButton1.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.iconButton1.Location = new System.Drawing.Point(480, 406);
+            this.iconButton1.Name = "iconButton1";
+            this.iconButton1.Size = new System.Drawing.Size(29, 32);
+            this.iconButton1.TabIndex = 11;
+            this.iconButton1.UseVisualStyleBackColor = false;
+            this.iconButton1.Click += new System.EventHandler(this.iconButton1_Click);
+            // 
+            // txtCadenaConexion
+            // 
+            this.txtCadenaConexion.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.txtCadenaConexion.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCadenaConexion.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtCadenaConexion.Location = new System.Drawing.Point(363, 415);
+            this.txtCadenaConexion.Name = "txtCadenaConexion";
+            this.txtCadenaConexion.Size = new System.Drawing.Size(111, 23);
+            this.txtCadenaConexion.TabIndex = 10;
             // 
             // btnLoginIngresar
             // 
@@ -170,6 +201,16 @@
             this.lblLoginContra.TabIndex = 1;
             this.lblLoginContra.Text = "Contraseña:";
             // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(534, 450);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox2.TabIndex = 8;
+            this.pictureBox2.TabStop = false;
+            // 
             // lblIniciodeSesion
             // 
             this.lblIniciodeSesion.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
@@ -182,16 +223,6 @@
             this.lblIniciodeSesion.TabIndex = 0;
             this.lblIniciodeSesion.Text = "Inicio de Sesion";
             this.lblIniciodeSesion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(534, 450);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox2.TabIndex = 8;
-            this.pictureBox2.TabStop = false;
             // 
             // lblLoginUsuario
             // 
@@ -235,5 +266,7 @@
         private System.Windows.Forms.PictureBox pictureBox2;
         private FontAwesome.Sharp.IconButton btnLoginIngresar;
         private System.Windows.Forms.Label lblLoginUsuario;
+        private FontAwesome.Sharp.IconButton iconButton1;
+        private System.Windows.Forms.TextBox txtCadenaConexion;
     }
 }

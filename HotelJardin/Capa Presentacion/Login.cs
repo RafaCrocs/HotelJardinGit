@@ -18,6 +18,10 @@ namespace Capa_Presentacion
         {
             InitializeComponent();
         }
+
+        private ConexionBL conexionBL = new ConexionBL();
+
+
         private void btnLoginIngresar_Click(object sender, EventArgs e)
         {
 
@@ -55,5 +59,20 @@ namespace Capa_Presentacion
             }
         }
 
+        private void iconButton1_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtCadenaConexion.Text))
+            {
+                bool resultado = conexionBL.ModificarConexion(txtCadenaConexion.Text);
+                if (resultado)
+                    MessageBox.Show("Cadena de conexión actualizada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                else
+                    MessageBox.Show("No se pudo actualizar la cadena de conexión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                MessageBox.Show("Ingresa una cadena de conexión válida.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
     }
 }

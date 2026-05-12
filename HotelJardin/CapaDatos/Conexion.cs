@@ -9,6 +9,8 @@ namespace CapaDatos
 {
     public class Conexion
     {
-        public static string cadena = ConfigurationManager.ConnectionStrings["Cadena_conexion"].ToString();
+        public static string cadena =>
+            ConfigurationManager.ConnectionStrings["Cadena_conexion"]?.ConnectionString
+            ?? "server=localhost; database=DBSistema_Ventas; integrated security=true";
     }
 }
