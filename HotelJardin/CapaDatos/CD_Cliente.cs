@@ -21,7 +21,7 @@ namespace CapaDatos
                 try
                 {
                     StringBuilder query = new StringBuilder();
-                    query.AppendLine("select IdCliente, CodigoCliente, NombreCompleto, Correo, PresupuestoInicial, Presupuesto from CLIENTE");
+                    query.AppendLine("select CodigoCliente, Nombres, Apellidos, PresupuestoInicial, Presupuesto from Clientes");
                     SqlCommand cmd = new SqlCommand(query.ToString(), oConexion);
                     cmd.CommandType = CommandType.Text;
                     oConexion.Open();
@@ -31,10 +31,9 @@ namespace CapaDatos
                         {
                             lista.Add(new Cliente()
                             {
-                                IdCliente = Convert.ToInt32(drd["IdCliente"]),
                                 CodigoCliente = Convert.ToInt32(drd["CodigoCliente"]),
-                                NombreCompleto = drd["NombreCompleto"].ToString(),
-                                Correo = drd["Correo"].ToString(),
+                                Nombre = drd["Nombres"].ToString(),
+                                Apellido = drd["Apellidos"].ToString(),
                                 PresupuestoInicial = drd["PresupuestoInicial"] != DBNull.Value ? Convert.ToDecimal(drd["PresupuestoInicial"]) : 0,
                                 Presupuesto = drd["Presupuesto"] != DBNull.Value ? Convert.ToDecimal(drd["Presupuesto"]) : 0
                             });
@@ -46,28 +45,28 @@ namespace CapaDatos
             return lista;
         }
 
-        public int Registrar(Cliente obj, out string Mensaje)
+        public bool Registrar(Cliente obj, out string Mensaje)
         {
-            int IdClienteGenerado = 0;
+            bool resultado = false;
             Mensaje = string.Empty;
             try {
                 using (SqlConnection oConexion = new SqlConnection(Conexion.cadena)) {
                     SqlCommand cmd = new SqlCommand("SP_RegistrarCliente", oConexion);
-                    cmd.Parameters.AddWithValue("CodigoCliente", obj.CodigoCliente);
-                    cmd.Parameters.AddWithValue("NombreCompleto", obj.NombreCompleto);
-                    cmd.Parameters.AddWithValue("Correo", obj.Correo);
-                    cmd.Parameters.AddWithValue("PresupuestoInicial", obj.PresupuestoInicial);
-                    cmd.Parameters.AddWithValue("Presupuesto", obj.Presupuesto);
-                    cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+                    cmd.Parameters.AddWithValue("@CodigoCliente", obj.CodigoCliente);
+                    cmd.Parameters.AddWithValue("@Nombres", obj.Nombre);
+                    cmd.Parameters.AddWithValue("@Apellidos", obj.Apellido);
+                    cmd.Parameters.AddWithValue("@PresupuestoInicial", obj.PresupuestoInicial);
+                    cmd.Parameters.AddWithValue("@Presupuesto", obj.Presupuesto);
+                    cmd.Parameters.Add("@Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("@Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
                     cmd.CommandType = CommandType.StoredProcedure;
                     oConexion.Open();
                     cmd.ExecuteNonQuery();
-                    IdClienteGenerado = Convert.ToInt32(cmd.Parameters["Resultado"].Value);
-                    Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
+                    resultado = Convert.ToBoolean(cmd.Parameters["@Resultado"].Value);
+                    Mensaje = cmd.Parameters["@Mensaje"].Value.ToString();
                 }
-            } catch (Exception ex) { IdClienteGenerado = 0; Mensaje = ex.Message; }
-            return IdClienteGenerado;
+            } catch (Exception ex) { resultado = false; Mensaje = ex.Message; }
+            return resultado;
         }
 
         //Editar Cliente
@@ -80,13 +79,12 @@ namespace CapaDatos
                 using (SqlConnection oConexion = new SqlConnection(Conexion.cadena))
                 {
                     SqlCommand cmd = new SqlCommand("SP_ModificarCliente", oConexion);
-                    cmd.Parameters.AddWithValue("IdCliente", obj.IdCliente);
                     cmd.Parameters.AddWithValue("CodigoCliente", obj.CodigoCliente);
-                    cmd.Parameters.AddWithValue("NombreCompleto", obj.NombreCompleto);
-                    cmd.Parameters.AddWithValue("Correo", obj.Correo);
+                    cmd.Parameters.AddWithValue("Nombres", obj.Nombre);
+                    cmd.Parameters.AddWithValue("Apellidos", obj.Apellido);
                     cmd.Parameters.AddWithValue("PresupuestoInicial", obj.PresupuestoInicial);
                     cmd.Parameters.AddWithValue("Presupuesto", obj.Presupuesto);
-                    cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
                     cmd.CommandType = CommandType.StoredProcedure;
                     oConexion.Open();
@@ -113,8 +111,8 @@ namespace CapaDatos
             {
                 using (SqlConnection oConexion = new SqlConnection(Conexion.cadena))
                 {
-                    SqlCommand cmd = new SqlCommand("DELETE from CLIENTE where IdCliente = @IdCliente", oConexion);
-                    cmd.Parameters.AddWithValue("@IdCliente", obj.IdCliente);
+                    SqlCommand cmd = new SqlCommand("DELETE from Clientes where CodigoCliente = @CodigoCliente", oConexion);
+                    cmd.Parameters.AddWithValue("@CodigoCliente", obj.CodigoCliente);
                     cmd.CommandType = CommandType.Text;
                     oConexion.Open();
 
@@ -141,7 +139,7 @@ namespace CapaDatos
                 using (SqlConnection oConexion = new SqlConnection(Conexion.cadena))
                 {
                     SqlCommand cmd = new SqlCommand("SP_ActualizarPresupuestoCliente", oConexion);
-                    cmd.Parameters.AddWithValue("@IdCliente", idCliente);
+                    cmd.Parameters.AddWithValue("@CodigoCliente", idCliente);
                     cmd.Parameters.AddWithValue("@NuevoPresupuesto", nuevoPresupuesto);
                     cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;

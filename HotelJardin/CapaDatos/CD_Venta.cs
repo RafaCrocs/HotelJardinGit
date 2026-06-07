@@ -102,7 +102,7 @@ namespace CapaDatos
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("IdUsuario", obj.oUsuario.IdUsuario);
-                        cmd.Parameters.AddWithValue("IdCliente", obj.oCliente.IdCliente);
+                        cmd.Parameters.AddWithValue("CodigoCliente", obj.oCliente.CodigoCliente);
                         cmd.Parameters.AddWithValue("NombreCliente", obj.NombreCliente);
                         cmd.Parameters.AddWithValue("ModoPago", obj.ModoPago);
                         cmd.Parameters.AddWithValue("NumeroFact", obj.NumeroFact);
@@ -112,7 +112,7 @@ namespace CapaDatos
                         // Agregar DataTable como parámetro estructurado (TVP)
                         var p = cmd.Parameters.AddWithValue("@DetalleVenta", DetalleVenta);
                         p.SqlDbType = SqlDbType.Structured;
-                        p.TypeName = "dbo.EDetalle_Venta"; // nombre del UDT en la BD
+                        p.TypeName = "dbo.EDetalle_Venta2"; // nombre del UDT en la BD
 
                         cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
                         cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;

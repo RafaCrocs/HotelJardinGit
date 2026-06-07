@@ -28,6 +28,13 @@ namespace Capa_Presentacion.Modales
 
         private void cargarGrid()
         {
+
+            dataGridInventario.Font = new Font("Segoe UI", 12);
+            dataGridInventario.RowsDefaultCellStyle.BackColor = SystemColors.InactiveBorder;
+            dataGridInventario.AlternatingRowsDefaultCellStyle.BackColor = SystemColors.InactiveCaption;
+            dataGridInventario.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+
+
             List<Inventario> lista = new CN_Inventario().Listar();
             dataGridInventario.DataSource = lista;
         }
@@ -48,7 +55,7 @@ namespace Capa_Presentacion.Modales
             {
                 _Inventario = new Inventario()
                 {
-                    Codigo = Convert.ToInt32(dataGridInventario.Rows[iRow].Cells["Codigo"].Value),
+                    Codigo = dataGridInventario.Rows[iRow].Cells["Codigo"].Value.ToString(),
                 };
                 this.DialogResult = DialogResult.OK;
                 this.Close();

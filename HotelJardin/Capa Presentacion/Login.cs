@@ -61,17 +61,15 @@ namespace Capa_Presentacion
 
         private void iconButton1_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(txtCadenaConexion.Text))
+            if (conexionBL.ModificarCadenaConexion(txtCadenaConexion.Text))
             {
-                bool resultado = conexionBL.ModificarConexion(txtCadenaConexion.Text);
-                if (resultado)
-                    MessageBox.Show("Cadena de conexión actualizada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                else
-                    MessageBox.Show("No se pudo actualizar la cadena de conexión.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Cadena de conexión modificada correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             }
             else
             {
-                MessageBox.Show("Ingresa una cadena de conexión válida.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Error al modificar la cadena de conexión", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
             }
         }
     }

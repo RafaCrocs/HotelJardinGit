@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace Capa_Presentacion
         private bool clienteSeleccionado = false;
         private decimal totalVenta = 0m;
 
-        private int IdClienteSeleccionado = 0;
+        public int CodigoClienteSeleccionado = 0;
         private string correoCliente = "";
         public frmVenta(Usuario oUsuario = null)
         {
@@ -80,14 +81,15 @@ namespace Capa_Presentacion
                 if (result == DialogResult.OK)
                 {
                     txtQRCliente.Text = modal._Cliente.CodigoCliente.ToString();
-                    txtNombreCompleto.Text = modal._Cliente.NombreCompleto.ToString();
+                    txtNombreCompleto.Text = modal._Cliente.Nombre.ToString() + " " + modal._Cliente.Apellido.ToString();
+
 
                     try
                     {
                         presupuestoInicial = Convert.ToDecimal(modal._Cliente.Presupuesto);
                         clienteSeleccionado = true;
 
-                        IdClienteSeleccionado = modal._Cliente.IdCliente;
+                        CodigoClienteSeleccionado = modal._Cliente.CodigoCliente;
                         if (this.Controls.ContainsKey("txtPresupuesto"))
                         {
                             var ctrl = this.Controls["txtPresupuesto"] as TextBox;
@@ -134,12 +136,6 @@ namespace Capa_Presentacion
                 return;
             }
 
-            if (!int.TryParse(input, out int codigo))
-            {
-                MessageBox.Show("El código debe ser un número válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             List<Inventario> lista;
             try
             {
@@ -151,10 +147,10 @@ namespace Capa_Presentacion
                 return;
             }
 
-            var item = lista.FirstOrDefault(i => i.Codigo == codigo);
+            var item = lista.FirstOrDefault(i => i.Codigo.ToUpper() == txtCodigo.Text.ToUpper());
             if (item == null)
             {
-                MessageBox.Show($"No se encontró producto con el código {codigo}.", "Producto no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"No se encontró producto con el código {txtCodigo.Text}.", "Producto no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtCodigo.Clear();
                 return;
             }
@@ -168,13 +164,29 @@ namespace Capa_Presentacion
 
         private void iconButton2_Click(object sender, EventArgs e)
         {
+            if (txtQRCliente.Text == "")
+            {
+                MessageBox.Show("Debe seleccionar un cliente antes de agregar productos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             using (var modal = new mdInventario())
             {
                 var result = modal.ShowDialog();
 
                 if (result == DialogResult.OK)
                 {
-                    txtCodigo.Text = modal._Inventario.Codigo.ToString();
+                    List<Inventario> lista = new CN_Inventario().Listar();
+                    txtCodigo.Text = modal._Inventario.Codigo;
+
+                    var item = lista.FirstOrDefault(i => i.Codigo == txtCodigo.Text);
+                    if (item != null)
+                    {
+                        AgregarInventarioAlGrid(item);
+                        // Limpiar y devolver foco
+                        txtCodigo.Clear();
+                        txtCodigo.Focus();
+                    }
+
                 }
             }
         }
@@ -182,6 +194,11 @@ namespace Capa_Presentacion
         // Agrega un inventario al grid; si ya existe, incrementa cantidad y actualiza subtotal
         private void AgregarInventarioAlGrid(Inventario inv)
         {
+            dataGridView1.Font = new Font("Segoe UI", 12);
+            dataGridView1.RowsDefaultCellStyle.BackColor = SystemColors.InactiveBorder;
+            dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = SystemColors.InactiveCaption;
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+
             if (inv == null) return;
 
             string codigoStr = inv.Codigo.ToString();
@@ -189,39 +206,60 @@ namespace Capa_Presentacion
             decimal precio = inv.Precio;
 
             // Buscar fila existente por Código
+            DataGridViewRow filaExistente = null;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if (row.IsNewRow) continue;
-                var cellVal = Convert.ToString(row.Cells["Codigo"].Value);
-                if (cellVal == codigoStr)
+                if (Convert.ToString(row.Cells["Codigo"].Value) == codigoStr)
                 {
-                    int cantidad = 1;
-                    int.TryParse(Convert.ToString(row.Cells["Cantidad"].Value), out cantidad);
-                    cantidad++;
-                    row.Cells["Cantidad"].Value = cantidad.ToString();
-
-                    decimal subtotal = cantidad * precio;
-                    row.Cells["SubTotal"].Value = subtotal.ToString("0.00");
-
-                    CalcularTotales();
-                    return;
+                    filaExistente = row;
+                    break;
                 }
             }
 
-            // Si no existe, agregar nueva fila con cantidad 1
-            // ORDEN de columnas en el grid: Codigo, Descripcion, Cantidad, Agregar (botón), SubTotal, asd (botón)
-            dataGridView1.Rows.Add(new object[]
+            if (filaExistente != null)
+            {
+                // Existe: incrementar cantidad, eliminar y reinsertar al inicio
+                int cantidad = 1;
+                int.TryParse(Convert.ToString(filaExistente.Cells["Cantidad"].Value), out cantidad);
+                cantidad++;
+                decimal subtotal = cantidad * precio;
+
+                dataGridView1.Rows.Remove(filaExistente);
+                dataGridView1.Rows.Insert(0, new object[]
+                {
+                    codigoStr, descripcion, cantidad.ToString(), "",
+                    subtotal.ToString("0.00", CultureInfo.InvariantCulture), subtotal.ToString("0.00", CultureInfo.InvariantCulture), ""
+                });
+
+                CalcularTotales();
+                SeleccionarFilaSuperior();
+                return;
+            }
+
+            // Si no existe, insertar nueva fila al inicio con cantidad 1
+            dataGridView1.Rows.Insert(0, new object[]
             {
                 codigoStr,              // Codigo
                 descripcion,            // Descripcion
                 1,                      // Cantidad
                 "",                     // Agregar (columna botón) -> placeholder
-                precio.ToString("0.00"),// SubTotal
-                precio.ToString("0.00"),// SubTotal inicial (cantidad 1)
+                precio.ToString("0.00", CultureInfo.InvariantCulture),// SubTotal
+                precio.ToString("0.00", CultureInfo.InvariantCulture),// SubTotal inicial (cantidad 1)
                 ""                      // asd (columna botón) -> placeholder
             });
 
             CalcularTotales();
+            SeleccionarFilaSuperior();
+        }
+
+        private void SeleccionarFilaSuperior()
+        {
+            if (dataGridView1.Rows.Count > 0 && !dataGridView1.Rows[0].IsNewRow)
+            {
+                dataGridView1.ClearSelection();
+                dataGridView1.Rows[0].Selected = true;
+            }
         }
 
         private void CalcularTotales()
@@ -235,7 +273,7 @@ namespace Capa_Presentacion
                 if (row.IsNewRow) continue;
                 decimal subtotal = 0m;
                 int cantidad = 0;
-                decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), out subtotal);
+                decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
                 int.TryParse(Convert.ToString(row.Cells["Cantidad"].Value), out cantidad);
 
                 total += subtotal;
@@ -253,14 +291,14 @@ namespace Capa_Presentacion
                     Console.WriteLine("asd);");
                 }
                 decimal presupuestoActual = -presupuestoInicial + total;
-                txtTotal.Text = presupuestoActual.ToString("0.00");
+                txtTotal.Text = presupuestoActual.ToString("0.00", CultureInfo.InvariantCulture);
             }
             else
             {
-                txtTotal.Text = totalVenta.ToString("0.00");
+                txtTotal.Text = totalVenta.ToString("0.00", CultureInfo.InvariantCulture);
             }
 
-            txtTotalVenta.Text = total.ToString("0.00");
+            txtTotalVenta.Text = total.ToString("0.00", CultureInfo.InvariantCulture);
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -279,7 +317,7 @@ namespace Capa_Presentacion
                 int cantidad = 0;
                 decimal subtotal = 0m;
                 int.TryParse(Convert.ToString(row.Cells["Cantidad"].Value), out cantidad);
-                decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), out subtotal);
+                decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
 
                 // Determinar acción por nombre de columna
                 if (column.Name == "Agregar")
@@ -296,7 +334,7 @@ namespace Capa_Presentacion
                         // si no hay subtotal ni cantidad, intentar leer precio unitario desde fila (si existe una columna oculta u otra fuente)
                         // aquí asumimos que cuando se agregó la fila con cantidad=1, SubTotal ya lleva el precio unitario; si subtotal es 0 y cantidad 0,
                         // no podemos calcular: dejar precioUnitario en 0 y evitar división por cero
-                        decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), out precioUnitario);
+                        decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out precioUnitario);
                     }
 
                     // Si precioUnitario es 0 y cantidad==0, intentar inferirlo desde el último valor conocido (no disponible), por ahora no cambiaría subtotal.
@@ -312,7 +350,7 @@ namespace Capa_Presentacion
                     }
 
                     row.Cells["Cantidad"].Value = nuevaCantidad.ToString();
-                    row.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00");
+                    row.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
 
                     CalcularTotales();
                     return;
@@ -336,7 +374,7 @@ namespace Capa_Presentacion
                     decimal nuevoSubtotal = Math.Round(precioUnitario * nuevaCantidad, 2);
 
                     row.Cells["Cantidad"].Value = nuevaCantidad.ToString();
-                    row.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00");
+                    row.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
 
                     CalcularTotales();
                     return;
@@ -425,7 +463,7 @@ namespace Capa_Presentacion
             // Construir DataTable exactamente como el UDT dbo.EDetalle_Venta
             DataTable dtDetalle = new DataTable();
 
-            dtDetalle.Columns.Add("IdInventario", typeof(int));
+            dtDetalle.Columns.Add("IdInventario", typeof(string));
             dtDetalle.Columns.Add("Detalle", typeof(string));
             dtDetalle.Columns.Add("Precio", typeof(decimal));
             dtDetalle.Columns.Add("Cantidad", typeof(int));
@@ -434,11 +472,11 @@ namespace Capa_Presentacion
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 dtDetalle.Rows.Add(
-                    Convert.ToInt32(row.Cells["Codigo"].Value),
+                    row.Cells["Codigo"].Value.ToString(),
                     row.Cells["Descripcion"].Value.ToString(),
-                    Convert.ToDecimal(row.Cells["PrecioUnitario"].Value),
+                    decimal.Parse(row.Cells["PrecioUnitario"].Value.ToString(), CultureInfo.InvariantCulture),
                     Convert.ToInt32(row.Cells["Cantidad"].Value),
-                    Convert.ToDecimal(row.Cells["SubTotal"].Value)
+                    decimal.Parse(row.Cells["SubTotal"].Value.ToString(), CultureInfo.InvariantCulture)
                 );
             }
 
@@ -457,10 +495,11 @@ namespace Capa_Presentacion
             {
                 oUsuario = new Usuario() { IdUsuario = _Usuario.IdUsuario },
                 NumeroFact = Convert.ToInt32(NumeroVentaStr),
-                oCliente = new Cliente() {IdCliente = IdClienteSeleccionado, CodigoCliente = Convert.ToInt32(txtQRCliente.Text) }, 
+                oCliente = new Cliente() { CodigoCliente = CodigoClienteSeleccionado },
+
                 NombreCliente = txtNombreCompleto.Text,
                 ModoPago = cmbModoPago.SelectedItem.ToString(),
-                MontoTotal = decimal.TryParse(txtTotal.Text, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out decimal mt) ? mt : 0,
+                MontoTotal = decimal.TryParse(txtTotal.Text, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal mt) ? mt : 0,
                 FechaRegistro = DateTime.Now
             };
 
@@ -474,7 +513,7 @@ namespace Capa_Presentacion
                 // txtTotal muestra: -PresupuestoActual + GastosVenta
                 // Si txtTotal es 0, significa que se gastó exactamente el presupuesto.
                 decimal resultadoCalculado = 0m;
-                decimal.TryParse(txtTotal.Text, out resultadoCalculado);
+                decimal.TryParse(txtTotal.Text, NumberStyles.Number, CultureInfo.InvariantCulture, out resultadoCalculado);
                 
                 decimal nuevoPresupuesto;
                 if (resultadoCalculado >= 0)
@@ -490,7 +529,7 @@ namespace Capa_Presentacion
 
                 string mensajePresupuesto = string.Empty;
                 // Se actualiza el campo 'Presupuesto' (saldo actual) en la base de datos
-                new CN_Cliente().ActualizarPresupuesto(IdClienteSeleccionado, nuevoPresupuesto, out mensajePresupuesto);
+                new CN_Cliente().ActualizarPresupuesto(CodigoClienteSeleccionado, nuevoPresupuesto, out mensajePresupuesto);
 
                 MessageBox.Show("Venta registrada correctamente", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 
@@ -502,7 +541,7 @@ namespace Capa_Presentacion
                 presupuestoInicial = 0m;
                 clienteSeleccionado = false;
                 totalVenta = 0m;
-                IdClienteSeleccionado = 0;
+                CodigoClienteSeleccionado = 0;
                 if (this.Controls.ContainsKey("txtPresupuesto"))
                 {
                     var ctrl = this.Controls["txtPresupuesto"] as TextBox;
@@ -585,7 +624,7 @@ namespace Capa_Presentacion
                 if (cliente != null)
                 {
                     txtQRCliente.Text = cliente.CodigoCliente.ToString();
-                    txtNombreCompleto.Text = cliente.NombreCompleto ?? "";
+                    txtNombreCompleto.Text = cliente.Nombre ?? "";
                     try
                     {
                         presupuestoInicial = Convert.ToDecimal(cliente.Presupuesto);
@@ -596,7 +635,7 @@ namespace Capa_Presentacion
                     }
 
                     clienteSeleccionado = true;
-                    IdClienteSeleccionado = cliente.IdCliente;
+                    CodigoClienteSeleccionado = cliente.CodigoCliente;
 
                     if (this.Controls.ContainsKey("txtPresupuesto"))
                     {
@@ -607,7 +646,7 @@ namespace Capa_Presentacion
                         }
                     }
 
-                    txtTotal.Text = (-presupuestoInicial).ToString("0.00");
+                    txtTotal.Text = (-presupuestoInicial).ToString("0.00", CultureInfo.InvariantCulture);
                     totalVenta = 0m;
 
                     this.ActiveControl = txtCodigo;
@@ -618,6 +657,72 @@ namespace Capa_Presentacion
                     txtNombreCompleto.Text = "";
                     MessageBox.Show($"No se encontró un cliente con el código {codigo}.", "Cliente no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+            }
+        }
+
+        private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void txtCodigo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '+')
+            {
+                e.Handled = true;
+
+                // El último agregado siempre está en la primera fila
+                var ultimaFila = dataGridView1.Rows.Cast<DataGridViewRow>()
+                                    .FirstOrDefault(r => !r.IsNewRow);
+                if (ultimaFila == null) return;
+
+                int cantidad = 0;
+                decimal subtotal = 0m;
+                int.TryParse(Convert.ToString(ultimaFila.Cells["Cantidad"].Value), out cantidad);
+                decimal.TryParse(Convert.ToString(ultimaFila.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
+
+                decimal precioUnitario = subtotal / Math.Max(cantidad, 1);
+                int nuevaCantidad = cantidad + 1;
+                decimal nuevoSubtotal = Math.Round(precioUnitario * nuevaCantidad, 2);
+
+                ultimaFila.Cells["Cantidad"].Value = nuevaCantidad.ToString();
+                ultimaFila.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
+
+                CalcularTotales();
+                SeleccionarFilaSuperior();
+            }
+            else if (e.KeyChar == '-')
+            {
+                e.Handled = true;
+
+                // El último agregado siempre está en la primera fila
+                var ultimaFila = dataGridView1.Rows.Cast<DataGridViewRow>()
+                                    .FirstOrDefault(r => !r.IsNewRow);
+                if (ultimaFila == null) return;
+
+                int cantidad = 0;
+                decimal subtotal = 0m;
+                int.TryParse(Convert.ToString(ultimaFila.Cells["Cantidad"].Value), out cantidad);
+                decimal.TryParse(Convert.ToString(ultimaFila.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
+
+                if (cantidad == 1)
+                {
+                    // Si queda 1, eliminar la fila igual que la columna "asd"
+                    dataGridView1.Rows.Remove(ultimaFila);
+                    CalcularTotales();
+                    SeleccionarFilaSuperior();
+                    return;
+                }
+
+                decimal precioUnitario = subtotal / Math.Max(cantidad, 1);
+                int nuevaCantidad = cantidad - 1;
+                decimal nuevoSubtotal = Math.Round(precioUnitario * nuevaCantidad, 2);
+
+                ultimaFila.Cells["Cantidad"].Value = nuevaCantidad.ToString();
+                ultimaFila.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
+
+                CalcularTotales();
+                SeleccionarFilaSuperior();
             }
         }
     }

@@ -23,7 +23,7 @@ namespace CapaDatos
                 try
                 {
                     StringBuilder query = new StringBuilder();
-                    query.AppendLine("select IdInventario, Codigo, Descripcion, Proveedor, Cantidad, Precio  from INVENTARIO");
+                    query.AppendLine("select IdInventario, Codigo, Descripcion, Proveedor, Cantidad, Precio  from INVENTARIO order by IdInventario desc");
 
                     SqlCommand cmd = new SqlCommand(query.ToString(), oConexion);
                     cmd.CommandType = CommandType.Text;
@@ -38,7 +38,7 @@ namespace CapaDatos
                             lista.Add(new Inventario()
                             {
                                 IdInventario = Convert.ToInt32(drd["IdInventario"]),
-                                Codigo = Convert.ToInt32(drd["Codigo"]),
+                                Codigo = drd["Codigo"].ToString(),
                                 Descripcion = drd["Descripcion"].ToString(),
                                 Proveedor = drd["Proveedor"].ToString(),
                                 Cantidad = Convert.ToInt32(drd["Cantidad"]),
@@ -58,9 +58,9 @@ namespace CapaDatos
         }
 
 
-        public int Registrar(Inventario obj, out string Mensaje)
+        public bool Registrar(Inventario obj, out string Mensaje)
         {
-            int IdInventarioGenerado = 0;
+            bool resultado = false;
             Mensaje = string.Empty;
 
             try
@@ -73,25 +73,25 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("Proveedor", obj.Proveedor);
                     cmd.Parameters.AddWithValue("Cantidad", obj.Cantidad);
                     cmd.Parameters.AddWithValue("Precio", obj.Precio);
-                    cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
                     cmd.CommandType = CommandType.StoredProcedure;
                     oConexion.Open();
                     cmd.ExecuteNonQuery();
-                    IdInventarioGenerado = Convert.ToInt32(cmd.Parameters["Resultado"].Value);
+                    resultado = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
                     Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
                 }
             }
             catch (Exception ex)
             {
-                IdInventarioGenerado = 0;
+                resultado = false;
                 Mensaje = ex.Message;
             }
 
 
 
 
-            return IdInventarioGenerado;
+            return resultado;
         }
 
         //Editar Inventario

@@ -19,7 +19,7 @@ namespace CapaNegocio
             return objcd_Inventario.Listar();
         }
 
-        public int Registrar(Inventario obj, out string Mensaje)
+        public bool Registrar(Inventario obj, out string Mensaje)
         {
             Mensaje = string.Empty;
             if (obj.Codigo == null)
@@ -37,7 +37,7 @@ namespace CapaNegocio
 
             if (Mensaje != string.Empty)
             {
-                return 0;
+                return false;
             }
             else
             {

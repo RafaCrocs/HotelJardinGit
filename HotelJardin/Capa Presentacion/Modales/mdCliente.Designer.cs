@@ -36,10 +36,9 @@
             this.label8 = new System.Windows.Forms.Label();
             this.dataGridCliente = new System.Windows.Forms.DataGridView();
             this.dsa = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.IdCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Codigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.NombreCompleto = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Correo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Nombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Apellido = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Presupuesto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PresupuestoInicial = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.FechaRegistro = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -99,10 +98,9 @@
             this.dataGridCliente.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridCliente.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dsa,
-            this.IdCliente,
             this.Codigo,
-            this.NombreCompleto,
-            this.Correo,
+            this.Nombre,
+            this.Apellido,
             this.Presupuesto,
             this.PresupuestoInicial,
             this.FechaRegistro});
@@ -123,32 +121,25 @@
             this.dsa.Name = "dsa";
             this.dsa.Width = 30;
             // 
-            // IdCliente
-            // 
-            this.IdCliente.DataPropertyName = "IdCliente";
-            this.IdCliente.HeaderText = "IdCliente";
-            this.IdCliente.Name = "IdCliente";
-            this.IdCliente.Visible = false;
-            // 
             // Codigo
             // 
             this.Codigo.DataPropertyName = "CodigoCliente";
             this.Codigo.HeaderText = "Codigo";
             this.Codigo.Name = "Codigo";
             // 
-            // NombreCompleto
+            // Nombre
             // 
-            this.NombreCompleto.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.NombreCompleto.DataPropertyName = "NombreCompleto";
-            this.NombreCompleto.HeaderText = "Nombre Completo";
-            this.NombreCompleto.Name = "NombreCompleto";
+            this.Nombre.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Nombre.DataPropertyName = "Nombre";
+            this.Nombre.HeaderText = "Nombre";
+            this.Nombre.Name = "Nombre";
             // 
-            // Correo
+            // Apellido
             // 
-            this.Correo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Correo.DataPropertyName = "Correo";
-            this.Correo.HeaderText = "Correo";
-            this.Correo.Name = "Correo";
+            this.Apellido.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Apellido.DataPropertyName = "Apellido";
+            this.Apellido.HeaderText = "Apellidos";
+            this.Apellido.Name = "Apellido";
             // 
             // Presupuesto
             // 
@@ -182,7 +173,7 @@
             this.Controls.Add(this.label8);
             this.Name = "mdCliente";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "mdCliente";
+            this.Text = "Clientes";
             this.Load += new System.EventHandler(this.mdCliente_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridCliente)).EndInit();
             this.ResumeLayout(false);
@@ -197,10 +188,9 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.DataGridView dataGridCliente;
         private System.Windows.Forms.DataGridViewButtonColumn dsa;
-        private System.Windows.Forms.DataGridViewTextBoxColumn IdCliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn Codigo;
-        private System.Windows.Forms.DataGridViewTextBoxColumn NombreCompleto;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Correo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Nombre;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Apellido;
         private System.Windows.Forms.DataGridViewTextBoxColumn Presupuesto;
         private System.Windows.Forms.DataGridViewTextBoxColumn PresupuestoInicial;
         private System.Windows.Forms.DataGridViewTextBoxColumn FechaRegistro;

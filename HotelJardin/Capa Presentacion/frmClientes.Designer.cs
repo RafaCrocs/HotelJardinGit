@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.label4 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.txtbusqueda = new System.Windows.Forms.TextBox();
@@ -42,24 +42,23 @@
             this.btnLimpiar = new FontAwesome.Sharp.IconButton();
             this.frmInicioGuardar = new FontAwesome.Sharp.IconButton();
             this.txtPresupuesto = new System.Windows.Forms.TextBox();
-            this.txtCorreo = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.frmUsuario1 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.dataGridCliente = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
-            this.txtNombreCompleto = new System.Windows.Forms.TextBox();
+            this.txtNombre = new System.Windows.Forms.TextBox();
             this.txtPresupuestoInicial = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.btnCargarClientes = new FontAwesome.Sharp.IconButton();
+            this.txtApellido = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.dsa = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.IdCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CodigoCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.NombreCompleto = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Correo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Nombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Apellido = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PresupuestoInicial = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Presupuesto = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FechaRegistro = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridCliente)).BeginInit();
             this.SuspendLayout();
             // 
@@ -96,7 +95,7 @@
             // txtCodigoCliente
             // 
             this.txtCodigoCliente.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCodigoCliente.Location = new System.Drawing.Point(27, 268);
+            this.txtCodigoCliente.Location = new System.Drawing.Point(27, 311);
             this.txtCodigoCliente.Margin = new System.Windows.Forms.Padding(4);
             this.txtCodigoCliente.Name = "txtCodigoCliente";
             this.txtCodigoCliente.Size = new System.Drawing.Size(301, 23);
@@ -106,7 +105,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(26, 246);
+            this.label7.Location = new System.Drawing.Point(26, 289);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(56, 18);
@@ -116,7 +115,7 @@
             // 
             // txtId
             // 
-            this.txtId.Location = new System.Drawing.Point(291, 120);
+            this.txtId.Location = new System.Drawing.Point(290, 172);
             this.txtId.Name = "txtId";
             this.txtId.Size = new System.Drawing.Size(38, 20);
             this.txtId.TabIndex = 55;
@@ -149,7 +148,7 @@
             this.iconButton3.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconButton3.IconSize = 30;
             this.iconButton3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.iconButton3.Location = new System.Drawing.Point(105, 621);
+            this.iconButton3.Location = new System.Drawing.Point(105, 585);
             this.iconButton3.Margin = new System.Windows.Forms.Padding(4);
             this.iconButton3.Name = "iconButton3";
             this.iconButton3.Size = new System.Drawing.Size(171, 33);
@@ -166,7 +165,7 @@
             this.btnLimpiar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnLimpiar.IconSize = 30;
             this.btnLimpiar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLimpiar.Location = new System.Drawing.Point(105, 580);
+            this.btnLimpiar.Location = new System.Drawing.Point(105, 544);
             this.btnLimpiar.Margin = new System.Windows.Forms.Padding(4);
             this.btnLimpiar.Name = "btnLimpiar";
             this.btnLimpiar.Size = new System.Drawing.Size(171, 33);
@@ -183,7 +182,7 @@
             this.frmInicioGuardar.IconFont = FontAwesome.Sharp.IconFont.Solid;
             this.frmInicioGuardar.IconSize = 30;
             this.frmInicioGuardar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.frmInicioGuardar.Location = new System.Drawing.Point(105, 539);
+            this.frmInicioGuardar.Location = new System.Drawing.Point(105, 503);
             this.frmInicioGuardar.Margin = new System.Windows.Forms.Padding(4);
             this.frmInicioGuardar.Name = "frmInicioGuardar";
             this.frmInicioGuardar.Size = new System.Drawing.Size(171, 33);
@@ -195,42 +194,22 @@
             // txtPresupuesto
             // 
             this.txtPresupuesto.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPresupuesto.Location = new System.Drawing.Point(28, 423);
+            this.txtPresupuesto.Location = new System.Drawing.Point(27, 401);
             this.txtPresupuesto.Margin = new System.Windows.Forms.Padding(4);
             this.txtPresupuesto.Name = "txtPresupuesto";
             this.txtPresupuesto.Size = new System.Drawing.Size(301, 23);
             this.txtPresupuesto.TabIndex = 47;
             // 
-            // txtCorreo
-            // 
-            this.txtCorreo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCorreo.Location = new System.Drawing.Point(30, 349);
-            this.txtCorreo.Margin = new System.Windows.Forms.Padding(4);
-            this.txtCorreo.Name = "txtCorreo";
-            this.txtCorreo.Size = new System.Drawing.Size(301, 23);
-            this.txtCorreo.TabIndex = 46;
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(27, 389);
+            this.label2.Location = new System.Drawing.Point(26, 379);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(92, 18);
             this.label2.TabIndex = 44;
             this.label2.Text = "Presupuesto";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(27, 314);
-            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(55, 18);
-            this.label6.TabIndex = 43;
-            this.label6.Text = "Correo";
             // 
             // frmUsuario1
             // 
@@ -254,31 +233,29 @@
             // 
             this.dataGridCliente.AllowUserToAddRows = false;
             this.dataGridCliente.BackgroundColor = System.Drawing.Color.WhiteSmoke;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(2);
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridCliente.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.Padding = new System.Windows.Forms.Padding(2);
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridCliente.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridCliente.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridCliente.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dsa,
-            this.IdCliente,
             this.CodigoCliente,
-            this.NombreCompleto,
-            this.Correo,
+            this.Nombre,
+            this.Apellido,
             this.PresupuestoInicial,
-            this.Presupuesto,
-            this.FechaRegistro});
+            this.Presupuesto});
             this.dataGridCliente.Location = new System.Drawing.Point(372, 139);
             this.dataGridCliente.MultiSelect = false;
             this.dataGridCliente.Name = "dataGridCliente";
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
-            this.dataGridCliente.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.Black;
+            this.dataGridCliente.RowsDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridCliente.RowTemplate.Height = 28;
             this.dataGridCliente.Size = new System.Drawing.Size(1036, 503);
             this.dataGridCliente.TabIndex = 53;
@@ -289,27 +266,27 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(24, 165);
+            this.label1.Location = new System.Drawing.Point(24, 191);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(131, 18);
+            this.label1.Size = new System.Drawing.Size(62, 18);
             this.label1.TabIndex = 66;
-            this.label1.Text = "Nombre Completo";
+            this.label1.Text = "Nombre";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // txtNombreCompleto
+            // txtNombre
             // 
-            this.txtNombreCompleto.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtNombreCompleto.Location = new System.Drawing.Point(27, 203);
-            this.txtNombreCompleto.Margin = new System.Windows.Forms.Padding(4);
-            this.txtNombreCompleto.Name = "txtNombreCompleto";
-            this.txtNombreCompleto.Size = new System.Drawing.Size(301, 23);
-            this.txtNombreCompleto.TabIndex = 67;
+            this.txtNombre.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtNombre.Location = new System.Drawing.Point(27, 213);
+            this.txtNombre.Margin = new System.Windows.Forms.Padding(4);
+            this.txtNombre.Name = "txtNombre";
+            this.txtNombre.Size = new System.Drawing.Size(301, 23);
+            this.txtNombre.TabIndex = 67;
             // 
             // txtPresupuestoInicial
             // 
             this.txtPresupuestoInicial.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPresupuestoInicial.Location = new System.Drawing.Point(29, 498);
+            this.txtPresupuestoInicial.Location = new System.Drawing.Point(29, 462);
             this.txtPresupuestoInicial.Margin = new System.Windows.Forms.Padding(4);
             this.txtPresupuestoInicial.Name = "txtPresupuestoInicial";
             this.txtPresupuestoInicial.Size = new System.Drawing.Size(301, 23);
@@ -319,25 +296,53 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(27, 464);
+            this.label3.Location = new System.Drawing.Point(27, 428);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(132, 18);
             this.label3.TabIndex = 69;
             this.label3.Text = "Presupuesto Inicial";
             // 
+            // btnCargarClientes
+            // 
+            this.btnCargarClientes.IconChar = FontAwesome.Sharp.IconChar.FileExcel;
+            this.btnCargarClientes.IconColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnCargarClientes.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.btnCargarClientes.IconSize = 25;
+            this.btnCargarClientes.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCargarClientes.Location = new System.Drawing.Point(372, 660);
+            this.btnCargarClientes.Name = "btnCargarClientes";
+            this.btnCargarClientes.Size = new System.Drawing.Size(168, 40);
+            this.btnCargarClientes.TabIndex = 70;
+            this.btnCargarClientes.Text = "Cargar Clientes";
+            this.btnCargarClientes.UseVisualStyleBackColor = true;
+            // 
+            // txtApellido
+            // 
+            this.txtApellido.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtApellido.Location = new System.Drawing.Point(27, 262);
+            this.txtApellido.Margin = new System.Windows.Forms.Padding(4);
+            this.txtApellido.Name = "txtApellido";
+            this.txtApellido.Size = new System.Drawing.Size(301, 23);
+            this.txtApellido.TabIndex = 72;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(27, 240);
+            this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(59, 18);
+            this.label10.TabIndex = 71;
+            this.label10.Text = "Apellido";
+            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // dsa
             // 
             this.dsa.HeaderText = "";
             this.dsa.Name = "dsa";
             this.dsa.Width = 30;
-            // 
-            // IdCliente
-            // 
-            this.IdCliente.DataPropertyName = "IdCliente";
-            this.IdCliente.HeaderText = "IdCliente";
-            this.IdCliente.Name = "IdCliente";
-            this.IdCliente.Visible = false;
             // 
             // CodigoCliente
             // 
@@ -346,19 +351,19 @@
             this.CodigoCliente.Name = "CodigoCliente";
             this.CodigoCliente.Width = 150;
             // 
-            // NombreCompleto
+            // Nombre
             // 
-            this.NombreCompleto.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.NombreCompleto.DataPropertyName = "NombreCompleto";
-            this.NombreCompleto.HeaderText = "Nombre Completo";
-            this.NombreCompleto.Name = "NombreCompleto";
+            this.Nombre.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Nombre.DataPropertyName = "Nombre";
+            this.Nombre.HeaderText = "Nombre";
+            this.Nombre.Name = "Nombre";
             // 
-            // Correo
+            // Apellido
             // 
-            this.Correo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Correo.DataPropertyName = "Correo";
-            this.Correo.HeaderText = "Correo";
-            this.Correo.Name = "Correo";
+            this.Apellido.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Apellido.DataPropertyName = "Apellido";
+            this.Apellido.HeaderText = "Apellidos";
+            this.Apellido.Name = "Apellido";
             // 
             // PresupuestoInicial
             // 
@@ -374,22 +379,18 @@
             this.Presupuesto.Name = "Presupuesto";
             this.Presupuesto.Width = 150;
             // 
-            // FechaRegistro
-            // 
-            this.FechaRegistro.DataPropertyName = "FechaRegistro";
-            this.FechaRegistro.HeaderText = "FechaRegistro";
-            this.FechaRegistro.Name = "FechaRegistro";
-            this.FechaRegistro.Visible = false;
-            // 
             // frmClientes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1552, 874);
+            this.Controls.Add(this.txtApellido);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.btnCargarClientes);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtPresupuestoInicial);
-            this.Controls.Add(this.txtNombreCompleto);
+            this.Controls.Add(this.txtNombre);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.txtbusqueda);
@@ -402,13 +403,11 @@
             this.Controls.Add(this.btnLimpiar);
             this.Controls.Add(this.frmInicioGuardar);
             this.Controls.Add(this.txtPresupuesto);
-            this.Controls.Add(this.txtCorreo);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.frmUsuario1);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.dataGridCliente);
             this.Controls.Add(this.label4);
+            this.Controls.Add(this.frmUsuario1);
             this.Name = "frmClientes";
             this.Text = "frmClientes";
             this.Load += new System.EventHandler(this.frmClientes_Load);
@@ -432,23 +431,22 @@
         private FontAwesome.Sharp.IconButton btnLimpiar;
         private FontAwesome.Sharp.IconButton frmInicioGuardar;
         private System.Windows.Forms.TextBox txtPresupuesto;
-        private System.Windows.Forms.TextBox txtCorreo;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label frmUsuario1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.DataGridView dataGridCliente;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtNombreCompleto;
+        private System.Windows.Forms.TextBox txtNombre;
         private System.Windows.Forms.TextBox txtPresupuestoInicial;
         private System.Windows.Forms.Label label3;
+        private FontAwesome.Sharp.IconButton btnCargarClientes;
+        private System.Windows.Forms.TextBox txtApellido;
+        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.DataGridViewButtonColumn dsa;
-        private System.Windows.Forms.DataGridViewTextBoxColumn IdCliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn CodigoCliente;
-        private System.Windows.Forms.DataGridViewTextBoxColumn NombreCompleto;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Correo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Nombre;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Apellido;
         private System.Windows.Forms.DataGridViewTextBoxColumn PresupuestoInicial;
         private System.Windows.Forms.DataGridViewTextBoxColumn Presupuesto;
-        private System.Windows.Forms.DataGridViewTextBoxColumn FechaRegistro;
     }
 }

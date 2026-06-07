@@ -26,6 +26,11 @@ namespace Capa_Presentacion
 
         private void cargarGrid()
         {
+            dataGridCliente.Font = new Font("Segoe UI", 12);
+            dataGridCliente.RowsDefaultCellStyle.BackColor = SystemColors.InactiveBorder;
+            dataGridCliente.AlternatingRowsDefaultCellStyle.BackColor = SystemColors.InactiveCaption;
+            dataGridCliente.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+
             clientes = new CN_Cliente().Listar();
             dataGridCliente.DataSource = clientes;
         }
@@ -44,10 +49,9 @@ namespace Capa_Presentacion
                 // inicialmente es igual al PresupuestoInicial si es un cliente nuevo.
                 Cliente obj = new Cliente()
                 {
-                    IdCliente = Convert.ToInt32(txtId.Text),
-                    NombreCompleto = txtNombreCompleto.Text,
                     CodigoCliente = Convert.ToInt32(txtCodigoCliente.Text),
-                    Correo = txtCorreo.Text,
+                    Nombre = txtNombre.Text,
+                    Apellido = txtApellido.Text,
                     PresupuestoInicial = Convert.ToDecimal(txtPresupuestoInicial.Text),
                     // Si es nuevo, el saldo disponible es el total inicial
                     Presupuesto = Convert.ToInt32(txtId.Text) == 0 ? 
@@ -55,10 +59,10 @@ namespace Capa_Presentacion
                                   Convert.ToDecimal(txtPresupuesto.Text)
                 };
 
-                if (obj.IdCliente == 0)
+                if (txtCodigoCliente.Enabled == true)
                 {
-                    int IdClienteGenerado = new CN_Cliente().Registrar(obj, out Mensaje);
-                    if (IdClienteGenerado != 0)
+                    bool IdClienteGenerado = new CN_Cliente().Registrar(obj, out Mensaje);
+                    if (IdClienteGenerado)
                     {
                         Limpiar();
                     }
@@ -71,11 +75,10 @@ namespace Capa_Presentacion
                     {
                         foreach (DataGridViewRow row in dataGridCliente.Rows)
                         {
-                            if (Convert.ToInt32(row.Cells["IdCliente"].Value) == obj.IdCliente)
+                            if (Convert.ToInt32(row.Cells["CodigoCliente"].Value) == obj.CodigoCliente)
                             {
-                                row.Cells["NombreCompleto"].Value = obj.NombreCompleto;
-                                row.Cells["CodigoCliente"].Value = obj.CodigoCliente;
-                                row.Cells["Correo"].Value = obj.Correo;
+                                row.Cells["Nombre"].Value = obj.Nombre;
+                                row.Cells["Apellido"].Value = obj.Apellido;
                                 row.Cells["PresupuestoInicial"].Value = obj.PresupuestoInicial;
                                 row.Cells["Presupuesto"].Value = obj.Presupuesto;
                                 break;
@@ -90,12 +93,13 @@ namespace Capa_Presentacion
         }
         private void Limpiar()
         {
-            txtNombreCompleto.Text = "";
+            txtNombre.Text = "";
+            txtApellido.Text = "";
             txtCodigoCliente.Text = "";
-            txtCorreo.Text = "";
             txtPresupuestoInicial.Text = "";
             txtPresupuesto.Text = "";
             txtId.Text = "0";
+            txtCodigoCliente.Enabled = true;
         }
 
         private void dataGridCliente_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
@@ -141,26 +145,27 @@ namespace Capa_Presentacion
                 if (indice >= 0) // allow row 0
                 {
                     var row = dataGridCliente.Rows[indice];
-                    // Use existing column names from designer
-                    txtId.Text = row.Cells["IdCliente"].Value?.ToString() ?? "0";
-                    txtNombreCompleto.Text = row.Cells["NombreCompleto"].Value?.ToString() ?? "";
+                    txtNombre.Text = row.Cells["Nombre"].Value?.ToString() ?? "";
+                    txtApellido.Text = row.Cells["Apellido"].Value?.ToString() ?? "";
                     txtCodigoCliente.Text = row.Cells["CodigoCliente"].Value?.ToString() ?? "";
-                    txtCorreo.Text = row.Cells["Correo"].Value?.ToString() ?? "";
                     txtPresupuestoInicial.Text = row.Cells["PresupuestoInicial"].Value?.ToString() ?? "";
                     txtPresupuesto.Text = row.Cells["Presupuesto"].Value?.ToString() ?? "";
-                }   
+                    txtCodigoCliente.Enabled = false;
+                }
             }
         }
 
         private void iconButton3_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(txtId.Text, out int idCliente) || idCliente == 0)
+            if(txtCodigoCliente.Text == "")
+            {
+                MessageBox.Show("Seleccione un Cliente para eliminar.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
-
+            }
             if (MessageBox.Show("¿Desea eliminar el Cliente?", "Mensaje", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 string Mensaje = string.Empty;
-                Cliente objCliente = new Cliente() { IdCliente = idCliente };
+                Cliente objCliente = new Cliente() { CodigoCliente = Convert.ToInt32(txtCodigoCliente.Text) };
 
                 bool resultado = new CN_Cliente().Eliminar(objCliente, out Mensaje);
                 if (resultado)
@@ -189,7 +194,7 @@ namespace Capa_Presentacion
         {
             if (txtbusqueda.Text.Length >= 3)
             {
-                var listaFiltrada = clientes.Where(x => (x.NombreCompleto ?? "").ToLower().Contains((txtbusqueda.Text).ToLower()) || (x.CodigoCliente.ToString() ?? "").ToLower().Contains((txtbusqueda.Text).ToLower())).ToList();
+                var listaFiltrada = clientes.Where(x => (x.Nombre ?? "").ToLower().Contains((txtbusqueda.Text).ToLower()) || (x.CodigoCliente.ToString() ?? "").ToLower().Contains((txtbusqueda.Text).ToLower()) || (x.Apellido ?? "").ToLower().Contains((txtbusqueda.Text).ToLower())).ToList();
                 dataGridCliente.DataSource = listaFiltrada;
             }
             else
@@ -197,5 +202,7 @@ namespace Capa_Presentacion
                 dataGridCliente.DataSource = clientes;
             }
         }
+
+        
     }
 }

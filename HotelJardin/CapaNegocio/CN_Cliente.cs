@@ -17,20 +17,20 @@ namespace CapaNegocio
             return objcd_Cliente.Listar();
         }
 
-        public int Registrar(Cliente obj, out string Mensaje)
+        public bool Registrar(Cliente obj, out string Mensaje)
         {
             Mensaje = string.Empty;
             if (obj.CodigoCliente == null)
             {
                 Mensaje = "El Codigo del Cliente no puede estar vacio\n";
             }
-            if (obj.NombreCompleto == "")
+            if (obj.Nombre == "")
             {
                 Mensaje = "Ingrese un Nombre\n";
             }
             if (Mensaje != string.Empty)
             {
-                return 0;
+                return false;
             }
             else
             {
@@ -46,7 +46,7 @@ namespace CapaNegocio
             {
                 Mensaje = "El Codigo del Cliente no puede estar vacio\n";
             }
-            if (obj.NombreCompleto == "")
+            if (obj.Nombre == "")
             {
                 Mensaje = "Ingrese un Nombre\n";
             }

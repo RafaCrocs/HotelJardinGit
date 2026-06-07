@@ -55,6 +55,8 @@
             this.label6 = new System.Windows.Forms.Label();
             this.txtTotal = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.txtTotalVenta = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.txtCantidadArticulos = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -62,8 +64,6 @@
             this.btnGuardar = new FontAwesome.Sharp.IconButton();
             this.label9 = new System.Windows.Forms.Label();
             this.cmbModoPago = new System.Windows.Forms.ComboBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.txtTotalVenta = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -165,6 +165,7 @@
             this.txtCodigo.Size = new System.Drawing.Size(136, 30);
             this.txtCodigo.TabIndex = 1;
             this.txtCodigo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtCodigo_KeyDown);
+            this.txtCodigo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtCodigo_KeyPress);
             // 
             // label4
             // 
@@ -253,6 +254,7 @@
             this.dataGridView1.TabIndex = 3;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridView1_CellPainting);
+            this.dataGridView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView1_KeyDown);
             // 
             // Codigo
             // 
@@ -333,6 +335,22 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Datos";
             // 
+            // txtTotalVenta
+            // 
+            this.txtTotalVenta.Location = new System.Drawing.Point(25, 204);
+            this.txtTotalVenta.Name = "txtTotalVenta";
+            this.txtTotalVenta.Size = new System.Drawing.Size(143, 38);
+            this.txtTotalVenta.TabIndex = 4;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(7, 159);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(190, 31);
+            this.label10.TabIndex = 3;
+            this.label10.Text = "Total de Venta";
+            // 
             // label8
             // 
             this.label8.AutoSize = true;
@@ -408,22 +426,6 @@
             this.cmbModoPago.Name = "cmbModoPago";
             this.cmbModoPago.Size = new System.Drawing.Size(202, 39);
             this.cmbModoPago.TabIndex = 10;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 159);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(190, 31);
-            this.label10.TabIndex = 3;
-            this.label10.Text = "Total de Venta";
-            // 
-            // txtTotalVenta
-            // 
-            this.txtTotalVenta.Location = new System.Drawing.Point(25, 204);
-            this.txtTotalVenta.Name = "txtTotalVenta";
-            this.txtTotalVenta.Size = new System.Drawing.Size(143, 38);
-            this.txtTotalVenta.TabIndex = 4;
             // 
             // frmVenta
             // 

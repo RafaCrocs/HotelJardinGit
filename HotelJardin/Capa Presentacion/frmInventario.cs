@@ -27,6 +27,10 @@ namespace Capa_Presentacion
 
         private void cargarGrid()
         {
+            dataGridInventario.Font = new Font("Segoe UI", 12);
+            dataGridInventario.RowsDefaultCellStyle.BackColor = SystemColors.InactiveBorder;
+            dataGridInventario.AlternatingRowsDefaultCellStyle.BackColor = SystemColors.InactiveCaption;
+            dataGridInventario.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             listaInventario = new CN_Inventario().Listar();
             dataGridInventario.DataSource = listaInventario;
         }
@@ -47,10 +51,10 @@ namespace Capa_Presentacion
                 Inventario obj = new Inventario()
                 {
                     IdInventario = Convert.ToInt32(txtId.Text),
-                    Codigo = Convert.ToInt32(txtInventarioCodigo.Text),
+                    Codigo = txtInventarioCodigo.Text.ToUpper(),
                     Descripcion = txtInventarioDescripcion.Text,
                     Proveedor = txtInventarioProveedor.Text,
-                    Cantidad = Convert.ToInt32(txtInventarioCantidad.Text),
+                    Cantidad = 0,
                     Precio = Convert.ToDecimal(txtInventarioPrecio.Text)
                 };
 
@@ -58,10 +62,10 @@ namespace Capa_Presentacion
 
                 if (obj.IdInventario == 0)
                 {
-                    int IdProductoGenerado = new CN_Inventario().Registrar(obj, out Mensaje);
+                    CN_Inventario cnInventario = new CN_Inventario();
 
 
-                    if (IdProductoGenerado != 0)
+                    if (cnInventario.Registrar(obj, out Mensaje))
                     {
                         Limpiar();
                         cargarGrid();
@@ -103,7 +107,6 @@ namespace Capa_Presentacion
                         MessageBox.Show(Mensaje);
                     }
                 }
-                cargarGrid();
             }
             catch (Exception ex)
             {
@@ -213,12 +216,103 @@ namespace Capa_Presentacion
             if (txtbusqueda.TextLength >= 3)
             {
                 var busqueda = txtbusqueda.Text.ToLower();
-                var listaFiltrada = listaInventario.Where(i => i.Descripcion.ToLower().Contains(busqueda) || i.Proveedor.ToLower().Contains(busqueda)).ToList();
+                var listaFiltrada = listaInventario.Where(i => i.Descripcion.ToLower().Contains(busqueda) || i.Proveedor.ToLower().Contains(busqueda) || i.Codigo.ToLower().Contains(busqueda)).ToList();
                 dataGridInventario.DataSource = listaFiltrada;
             }
             else
             {
                 dataGridInventario.DataSource = listaInventario;
+            }
+        }
+
+        private void txtInventarioCodigo_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter) {
+                txtInventarioDescripcion.Focus();
+            }
+        }
+
+        private void txtInventarioDescripcion_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                txtInventarioPrecio.Focus();
+            }
+        }
+
+        private void txtInventarioPrecio_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter) 
+            {
+                string Mensaje = string.Empty;
+                try
+                {
+                    Inventario obj = new Inventario()
+                    {
+                        IdInventario = Convert.ToInt32(txtId.Text),
+                        Codigo = txtInventarioCodigo.Text.ToUpper(),
+                        Descripcion = txtInventarioDescripcion.Text,
+                        Proveedor = txtInventarioProveedor.Text,
+                        Cantidad = 0,
+                        Precio = Convert.ToDecimal(txtInventarioPrecio.Text)
+                    };
+
+
+
+                    if (obj.IdInventario == 0)
+                    {
+                        CN_Inventario cnInventario = new CN_Inventario();
+
+
+                        if (cnInventario.Registrar(obj, out Mensaje))
+                        {
+                            Limpiar();
+                            cargarGrid();
+                        }
+                        else
+                        {
+                            MessageBox.Show(Mensaje);
+                        }
+                    }
+                    else
+                    {
+                        bool resultado = new CN_Inventario().Editar(obj, out Mensaje);
+                        if (resultado)
+                        {
+                            DataGridViewRow rowEncontrada = null;
+                            foreach (DataGridViewRow row in dataGridInventario.Rows)
+                            {
+                                if (Convert.ToInt32(row.Cells["IdInventario"].Value) == obj.IdInventario)
+                                {
+                                    rowEncontrada = row;
+                                    break;
+                                }
+                            }
+                            if (rowEncontrada != null)
+                            {
+                                rowEncontrada.Cells["Codigo"].Value = txtInventarioCodigo.Text;
+                                rowEncontrada.Cells["Descripcion"].Value = txtInventarioDescripcion.Text;
+                                rowEncontrada.Cells["Proveedor"].Value = txtInventarioProveedor.Text;
+                                rowEncontrada.Cells["Cantidad"].Value = txtInventarioCantidad.Text;
+                                rowEncontrada.Cells["Precio"].Value = txtInventarioPrecio.Text;
+                            }
+                            cargarGrid();
+                            Limpiar();
+
+
+                        }
+                        else
+                        {
+                            MessageBox.Show(Mensaje);
+                        }
+                    }
+                txtInventarioCodigo.Focus();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Datos Logicos...", "Error", MessageBoxButtons.OKCancel);
+                    Limpiar();
+                }
             }
         }
     }

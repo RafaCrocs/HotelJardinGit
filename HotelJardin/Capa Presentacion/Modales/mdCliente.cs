@@ -29,6 +29,12 @@ namespace Capa_Presentacion.Modales
 
         private void cargarGrid()
         {
+
+            dataGridCliente.Font = new Font("Segoe UI", 12);
+            dataGridCliente.RowsDefaultCellStyle.BackColor = SystemColors.InactiveBorder;
+            dataGridCliente.AlternatingRowsDefaultCellStyle.BackColor = SystemColors.InactiveCaption;
+            dataGridCliente.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+
             clientes = new CN_Cliente().Listar();
             dataGridCliente.DataSource = clientes;
 
@@ -46,9 +52,9 @@ namespace Capa_Presentacion.Modales
             {
                 _Cliente = new Cliente()
                 {
-                    IdCliente = Convert.ToInt32(dataGridCliente.Rows[iRow].Cells["IdCliente"].Value),
                     CodigoCliente = Convert.ToInt32(dataGridCliente.Rows[iRow].Cells["Codigo"].Value),
-                    NombreCompleto = dataGridCliente.Rows[iRow].Cells["NombreCompleto"].Value.ToString(),
+                    Nombre = dataGridCliente.Rows[iRow].Cells["Nombre"].Value.ToString(),
+                    Apellido = dataGridCliente.Rows[iRow].Cells["Apellido"].Value.ToString(),
                     Presupuesto = Convert.ToDecimal(dataGridCliente.Rows[iRow].Cells["Presupuesto"].Value)
                 };
                 this.DialogResult = DialogResult.OK;
@@ -67,7 +73,7 @@ namespace Capa_Presentacion.Modales
         {
             if(txtbusqueda.TextLength >= 3)
             {
-                var listaFiltrada = clientes.Where(x => x.NombreCompleto.ToLower().Contains(txtbusqueda.Text.ToLower()) || x.CodigoCliente.ToString().Contains(txtbusqueda.Text)).ToList();
+                var listaFiltrada = clientes.Where(x => x.Nombre.ToLower().Contains(txtbusqueda.Text.ToLower()) || x.CodigoCliente.ToString().Contains(txtbusqueda.Text)).ToList();
                 dataGridCliente.DataSource = listaFiltrada;
             }
             else
