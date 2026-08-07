@@ -229,7 +229,7 @@ namespace Capa_Presentacion
                 dataGridView1.Rows.Insert(0, new object[]
                 {
                     codigoStr, descripcion, cantidad.ToString(), "",
-                    subtotal.ToString("0.00", CultureInfo.InvariantCulture), subtotal.ToString("0.00", CultureInfo.InvariantCulture), ""
+                    precio.ToString("0.00", CultureInfo.InvariantCulture), subtotal.ToString("0.00", CultureInfo.InvariantCulture), ""
                 });
 
                 CalcularTotales();

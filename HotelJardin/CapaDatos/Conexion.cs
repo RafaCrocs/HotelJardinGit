@@ -9,7 +9,7 @@ namespace CapaDatos
 {
     public class Conexion
     {
-        public static string cadena = "server=30.0.0.205, 1433; database=DbSistemaVentas7; integrated security=false; user=sa; password=J4rd1n@2030";
+        public static string cadena = "server=localhost; database=DbSistemaVentas7; integrated security=true; TrustServerCertificate=True";
 
         public bool ModificarCadenaConexion(string ipCadena)
         {
