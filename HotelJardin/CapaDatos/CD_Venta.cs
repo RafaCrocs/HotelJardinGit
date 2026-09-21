@@ -114,6 +114,15 @@ namespace CapaDatos
                         p.SqlDbType = SqlDbType.Structured;
                         p.TypeName = "dbo.EDetalle_Venta2"; // nombre del UDT en la BD
 
+                        // Participantes de la factura compartida.
+                        // Solo viajan los codigos y su orden: el reparto del
+                        // presupuesto lo calcula usp_RegistrarVenta con los
+                        // saldos reales y las filas bloqueadas, no la aplicacion.
+                        var pClientes = cmd.Parameters.AddWithValue("@Participantes",
+                                            ConstruirTablaParticipantes(obj));
+                        pClientes.SqlDbType = SqlDbType.Structured;
+                        pClientes.TypeName = "dbo.EClientes_Venta";
+
                         cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
                         cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
 
@@ -133,7 +142,40 @@ namespace CapaDatos
             return resultado;
         }
 
-    }
+    
+        /// <summary>
+        /// Arma la tabla de participantes que espera el parametro estructurado
+        /// dbo.EClientes_Venta.
+        ///
+        /// Si la venta no trae participantes (por ejemplo, una llamada vieja de
+        /// un solo cliente), se envia el cliente de la cabecera. El
+        /// procedimiento almacenado acepta las dos formas.
+        /// </summary>
+        private DataTable ConstruirTablaParticipantes(Venta obj)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("CodigoCliente", typeof(int));
+            dt.Columns.Add("Orden", typeof(int));
+
+            if (obj.oParticipantes != null && obj.oParticipantes.Count > 0)
+            {
+                int orden = 1;
+                foreach (ParticipanteVenta p in obj.oParticipantes)
+                {
+                    if (p == null || p.CodigoCliente <= 0) continue;
+                    dt.Rows.Add(p.CodigoCliente, p.Orden > 0 ? p.Orden : orden);
+                    orden++;
+                }
+            }
+
+            if (dt.Rows.Count == 0 && obj.oCliente != null && obj.oCliente.CodigoCliente > 0)
+            {
+                dt.Rows.Add(obj.oCliente.CodigoCliente, 1);
+            }
+
+            return dt;
+        }
+}
 }
 
 

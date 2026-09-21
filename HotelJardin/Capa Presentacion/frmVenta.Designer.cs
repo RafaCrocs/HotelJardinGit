@@ -64,11 +64,19 @@
             this.btnGuardar = new FontAwesome.Sharp.IconButton();
             this.label9 = new System.Windows.Forms.Label();
             this.cmbModoPago = new System.Windows.Forms.ComboBox();
+            this.gridClientes = new System.Windows.Forms.DataGridView();
+            this.CodCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.NomCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SaldoCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.AsignadoCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RestanteCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.QuitarCliente = new System.Windows.Forms.DataGridViewButtonColumn();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridClientes)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -80,9 +88,9 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(25, 38);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(663, 146);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
@@ -95,7 +103,7 @@
             this.iconButton1.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconButton1.IconSize = 25;
             this.iconButton1.Location = new System.Drawing.Point(203, 78);
-            this.iconButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.iconButton1.Margin = new System.Windows.Forms.Padding(4);
             this.iconButton1.Name = "iconButton1";
             this.iconButton1.Size = new System.Drawing.Size(52, 37);
             this.iconButton1.TabIndex = 4;
@@ -105,7 +113,7 @@
             // txtNombreCompleto
             // 
             this.txtNombreCompleto.Location = new System.Drawing.Point(304, 78);
-            this.txtNombreCompleto.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtNombreCompleto.Margin = new System.Windows.Forms.Padding(4);
             this.txtNombreCompleto.Name = "txtNombreCompleto";
             this.txtNombreCompleto.ReadOnly = true;
             this.txtNombreCompleto.Size = new System.Drawing.Size(349, 36);
@@ -124,7 +132,7 @@
             // txtQRCliente
             // 
             this.txtQRCliente.Location = new System.Drawing.Point(13, 78);
-            this.txtQRCliente.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtQRCliente.Margin = new System.Windows.Forms.Padding(4);
             this.txtQRCliente.Name = "txtQRCliente";
             this.txtQRCliente.ReadOnly = true;
             this.txtQRCliente.Size = new System.Drawing.Size(180, 36);
@@ -148,9 +156,9 @@
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(25, 215);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox2.Size = new System.Drawing.Size(341, 146);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
@@ -163,7 +171,7 @@
             this.iconButton2.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconButton2.IconSize = 25;
             this.iconButton2.Location = new System.Drawing.Point(203, 78);
-            this.iconButton2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.iconButton2.Margin = new System.Windows.Forms.Padding(4);
             this.iconButton2.Name = "iconButton2";
             this.iconButton2.Size = new System.Drawing.Size(52, 37);
             this.iconButton2.TabIndex = 4;
@@ -173,7 +181,7 @@
             // txtCodigo
             // 
             this.txtCodigo.Location = new System.Drawing.Point(13, 78);
-            this.txtCodigo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtCodigo.Margin = new System.Windows.Forms.Padding(4);
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(180, 36);
             this.txtCodigo.TabIndex = 1;
@@ -198,10 +206,10 @@
             this.groupBox3.Controls.Add(this.txtFecha);
             this.groupBox3.Controls.Add(this.label5);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox3.Location = new System.Drawing.Point(769, 38);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Location = new System.Drawing.Point(16, 820);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox3.Size = new System.Drawing.Size(663, 146);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
@@ -214,7 +222,7 @@
             this.iconButton3.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconButton3.IconSize = 25;
             this.iconButton3.Location = new System.Drawing.Point(203, 78);
-            this.iconButton3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.iconButton3.Margin = new System.Windows.Forms.Padding(4);
             this.iconButton3.Name = "iconButton3";
             this.iconButton3.Size = new System.Drawing.Size(52, 37);
             this.iconButton3.TabIndex = 4;
@@ -223,7 +231,7 @@
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(304, 78);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(349, 36);
             this.textBox1.TabIndex = 3;
@@ -241,7 +249,7 @@
             // txtFecha
             // 
             this.txtFecha.Location = new System.Drawing.Point(13, 78);
-            this.txtFecha.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFecha.Margin = new System.Windows.Forms.Padding(4);
             this.txtFecha.Name = "txtFecha";
             this.txtFecha.Size = new System.Drawing.Size(180, 36);
             this.txtFecha.TabIndex = 1;
@@ -270,10 +278,10 @@
             this.SubTotal,
             this.asd});
             this.dataGridView1.Location = new System.Drawing.Point(16, 393);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.Size = new System.Drawing.Size(1445, 407);
+            this.dataGridView1.Size = new System.Drawing.Size(1008, 407);
             this.dataGridView1.TabIndex = 3;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridView1_CellPainting);
@@ -338,7 +346,7 @@
             // label6
             // 
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 45F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(1099, 258);
+            this.label6.Location = new System.Drawing.Point(1062, 362);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(312, 89);
@@ -348,8 +356,8 @@
             // txtTotal
             // 
             this.txtTotal.Font = new System.Drawing.Font("Microsoft Sans Serif", 45F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTotal.Location = new System.Drawing.Point(1393, 258);
-            this.txtTotal.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtTotal.Location = new System.Drawing.Point(1356, 362);
+            this.txtTotal.Margin = new System.Windows.Forms.Padding(4);
             this.txtTotal.Name = "txtTotal";
             this.txtTotal.Size = new System.Drawing.Size(249, 92);
             this.txtTotal.TabIndex = 5;
@@ -363,10 +371,10 @@
             this.groupBox4.Controls.Add(this.txtCantidadArticulos);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox4.Location = new System.Drawing.Point(1507, 431);
-            this.groupBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Location = new System.Drawing.Point(1095, 482);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox4.Size = new System.Drawing.Size(379, 318);
             this.groupBox4.TabIndex = 8;
             this.groupBox4.TabStop = false;
@@ -375,7 +383,7 @@
             // txtTotalVenta
             // 
             this.txtTotalVenta.Location = new System.Drawing.Point(33, 251);
-            this.txtTotalVenta.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtTotalVenta.Margin = new System.Windows.Forms.Padding(4);
             this.txtTotalVenta.Name = "txtTotalVenta";
             this.txtTotalVenta.Size = new System.Drawing.Size(189, 45);
             this.txtTotalVenta.TabIndex = 4;
@@ -402,7 +410,7 @@
             // txtCantidadArticulos
             // 
             this.txtCantidadArticulos.Location = new System.Drawing.Point(33, 122);
-            this.txtCantidadArticulos.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtCantidadArticulos.Margin = new System.Windows.Forms.Padding(4);
             this.txtCantidadArticulos.Name = "txtCantidadArticulos";
             this.txtCantidadArticulos.Size = new System.Drawing.Size(189, 45);
             this.txtCantidadArticulos.TabIndex = 1;
@@ -425,8 +433,8 @@
             this.iconButton4.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.iconButton4.IconSize = 45;
             this.iconButton4.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.iconButton4.Location = new System.Drawing.Point(1493, 158);
-            this.iconButton4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.iconButton4.Location = new System.Drawing.Point(1620, 608);
+            this.iconButton4.Margin = new System.Windows.Forms.Padding(4);
             this.iconButton4.Name = "iconButton4";
             this.iconButton4.Size = new System.Drawing.Size(211, 65);
             this.iconButton4.TabIndex = 7;
@@ -443,8 +451,8 @@
             this.btnGuardar.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnGuardar.IconSize = 45;
             this.btnGuardar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnGuardar.Location = new System.Drawing.Point(1493, 80);
-            this.btnGuardar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnGuardar.Location = new System.Drawing.Point(1591, 535);
+            this.btnGuardar.Margin = new System.Windows.Forms.Padding(4);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(263, 65);
             this.btnGuardar.TabIndex = 6;
@@ -468,17 +476,93 @@
             this.cmbModoPago.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbModoPago.FormattingEnabled = true;
             this.cmbModoPago.Location = new System.Drawing.Point(733, 282);
-            this.cmbModoPago.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmbModoPago.Margin = new System.Windows.Forms.Padding(4);
             this.cmbModoPago.Name = "cmbModoPago";
             this.cmbModoPago.Size = new System.Drawing.Size(268, 46);
             this.cmbModoPago.TabIndex = 10;
+            // 
+            // gridClientes
+            // 
+            this.gridClientes.AllowUserToAddRows = false;
+            this.gridClientes.BackgroundColor = System.Drawing.Color.White;
+            this.gridClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridClientes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.CodCliente,
+            this.NomCliente,
+            this.SaldoCliente,
+            this.AsignadoCliente,
+            this.RestanteCliente,
+            this.QuitarCliente});
+            this.gridClientes.Location = new System.Drawing.Point(762, 38);
+            this.gridClientes.Margin = new System.Windows.Forms.Padding(4);
+            this.gridClientes.Name = "gridClientes";
+            this.gridClientes.RowHeadersWidth = 51;
+            this.gridClientes.Size = new System.Drawing.Size(852, 208);
+            this.gridClientes.TabIndex = 11;
+            this.gridClientes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridClientes_CellContentClick);
+            // 
+            // CodCliente
+            // 
+            this.CodCliente.DataPropertyName = "CodCliente";
+            this.CodCliente.HeaderText = "Codigo";
+            this.CodCliente.MinimumWidth = 6;
+            this.CodCliente.Name = "CodCliente";
+            this.CodCliente.ReadOnly = true;
+            this.CodCliente.Width = 125;
+            // 
+            // NomCliente
+            // 
+            this.NomCliente.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.NomCliente.DataPropertyName = "NomCliente";
+            this.NomCliente.HeaderText = "Nombre";
+            this.NomCliente.MinimumWidth = 6;
+            this.NomCliente.Name = "NomCliente";
+            this.NomCliente.ReadOnly = true;
+            // 
+            // SaldoCliente
+            // 
+            this.SaldoCliente.DataPropertyName = "SaldoCliente";
+            this.SaldoCliente.HeaderText = "Saldo Disponible";
+            this.SaldoCliente.MinimumWidth = 6;
+            this.SaldoCliente.Name = "SaldoCliente";
+            this.SaldoCliente.ReadOnly = true;
+            this.SaldoCliente.Width = 125;
+            // 
+            // AsignadoCliente
+            // 
+            this.AsignadoCliente.DataPropertyName = "AsignadoCliente";
+            this.AsignadoCliente.HeaderText = "Le toca pagar:";
+            this.AsignadoCliente.MinimumWidth = 6;
+            this.AsignadoCliente.Name = "AsignadoCliente";
+            this.AsignadoCliente.ReadOnly = true;
+            this.AsignadoCliente.Width = 125;
+            // 
+            // RestanteCliente
+            // 
+            this.RestanteCliente.DataPropertyName = "RestanteCliente";
+            this.RestanteCliente.HeaderText = "Le queda:";
+            this.RestanteCliente.MinimumWidth = 6;
+            this.RestanteCliente.Name = "RestanteCliente";
+            this.RestanteCliente.ReadOnly = true;
+            this.RestanteCliente.Width = 125;
+            // 
+            // QuitarCliente
+            // 
+            this.QuitarCliente.HeaderText = "";
+            this.QuitarCliente.MinimumWidth = 6;
+            this.QuitarCliente.Name = "QuitarCliente";
+            this.QuitarCliente.Text = "Quitar";
+            this.QuitarCliente.UseColumnTextForButtonValue = true;
+            this.QuitarCliente.Width = 125;
             // 
             // frmVenta
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(2565, 958);
+            this.ClientSize = new System.Drawing.Size(2565, 985);
+            this.Controls.Add(this.gridClientes);
             this.Controls.Add(this.cmbModoPago);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.groupBox4);
@@ -490,7 +574,7 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmVenta";
             this.Text = "frmVenta";
             this.Load += new System.EventHandler(this.frmVenta_Load);
@@ -503,6 +587,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridClientes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -546,5 +631,12 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtTotalVenta;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.DataGridView gridClientes;
+        private System.Windows.Forms.DataGridViewTextBoxColumn CodCliente;
+        private System.Windows.Forms.DataGridViewTextBoxColumn NomCliente;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SaldoCliente;
+        private System.Windows.Forms.DataGridViewTextBoxColumn AsignadoCliente;
+        private System.Windows.Forms.DataGridViewTextBoxColumn RestanteCliente;
+        private System.Windows.Forms.DataGridViewButtonColumn QuitarCliente;
     }
 }

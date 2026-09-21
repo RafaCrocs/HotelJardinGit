@@ -1,729 +1,776 @@
-﻿using Capa_Presentacion.Modales;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+using Capa_Presentacion.Modales;
+using Capa_Presentacion.Utilidades;
 using CapaEntidad;
 using CapaNegocio;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Capa_Presentacion
 {
+    /// <summary>
+    /// Punto de venta con presupuesto compartido.
+    ///
+    /// Varias personas (pareja, trio, familia) pueden pagar una misma factura.
+    /// Cada una llega a la caja y da su codigo; el cajero las va agregando y el
+    /// sistema reparte el consumo en proporcion al saldo de cada quien.
+    ///
+    /// COMO SE USA EN CAJA
+    ///   1. Cada persona dicta o escanea su codigo en la caja "Codigo QR" y se
+    ///      pulsa Enter. Tambien se puede buscar con la lupa.
+    ///   2. Van apareciendo en el grid "Personas que comparten la factura",
+    ///      con su saldo y cuanto le toca pagar. La columna "Le toca" se
+    ///      recalcula sola con cada producto que se agrega.
+    ///   3. Se escanean los productos como siempre.
+    ///   4. Guardar. Cada persona queda con su saldo descontado.
+    ///
+    /// NOTA SOBRE EL GRID DE PARTICIPANTES
+    /// Se crea por codigo en ConstruirGridParticipantes(), no en el Designer.
+    /// Se ubica en el espacio libre que queda entre el grupo "Informacion Venta"
+    /// y el grid de productos. Si se reacomoda el formulario, basta con ajustar
+    /// las constantes de posicion que estan al inicio de ese metodo.
+    /// </summary>
     public partial class frmVenta : Form
     {
+        private readonly Usuario _usuario;
+        private readonly CarritoVenta _carrito = new CarritoVenta();
 
-        private Usuario _Usuario;
+        private List<Inventario> _inventario = new List<Inventario>();
+        private List<Cliente> _clientes = new List<Cliente>();
 
-        private decimal presupuestoInicial = 0m;
-        private bool clienteSeleccionado = false;
-        private decimal totalVenta = 0m;
+        // Grid de participantes, construido por codigo.
+        private GroupBox gbParticipantes;
 
-        public int CodigoClienteSeleccionado = 0;
-        private string correoCliente = "";
+        private bool _actualizandoCliente;
+        private bool _refrescando;
+
         public frmVenta(Usuario oUsuario = null)
         {
-
-            _Usuario = oUsuario;
+            _usuario = oUsuario;
             InitializeComponent();
         }
 
+        #region Carga
+
         private void frmVenta_Load(object sender, EventArgs e)
         {
-            txtFecha.Text = DateTime.Now.ToString("dd/MM/yyyy");
-            txtCodigo.Text = "";
-            txtTotal.Text = "";
-            txtCantidadArticulos.Text = "";
-            txtTotalVenta.Text = "";
-
-            if (this.Controls.ContainsKey("txtPresupuesto"))
+            if (_usuario == null)
             {
-                var ctrl = this.Controls["txtPresupuesto"] as TextBox;
-                if (ctrl != null) ctrl.Text = "";
+                Mensajes.Error("No hay un usuario valido en la sesion. No se pueden registrar ventas.");
+                btnGuardar.Enabled = false;
             }
 
+            ConfigurarGrid();
+            ConfigurarModosPago();
 
+            // El Designer deja esta caja en solo lectura. Como ahora cada
+            // persona llega y dicta su codigo, tiene que aceptar escritura.
+            txtQRCliente.ReadOnly = false;
+            txtQRCliente.KeyDown += txtQRCliente_KeyDown;
+
+            txtNombreCompleto.ReadOnly = true;
+            txtFecha.Text = DateTime.Now.ToString("dd/MM/yyyy");
+
+            CargarInventario();
+            CargarClientes();
+            LimpiarVenta();
+
+            ActiveControl = txtQRCliente;
+        }
+
+        /// <summary>
+        /// Crea el grid de participantes en el espacio libre del formulario.
+        ///
+        /// Coordenadas de referencia del Designer:
+        ///   groupBox2 ("Informacion Venta") ocupa hasta x=366, y=361
+        ///   dataGridView1 (productos)       empieza en y=393
+        ///   groupBox4                       empieza en x=1507
+        /// Queda libre un rectangulo de 1080x180 que es justo donde se coloca.
+        /// </summary>
+
+        private void ConfigurarGrid()
+        {
+            GridHelper.AplicarEstilo(dataGridView1);
+            dataGridView1.CellEndEdit += dataGridView1_CellEndEdit;
+
+            dataGridView1.Columns["Codigo"].ReadOnly = true;
+            dataGridView1.Columns["Descripcion"].ReadOnly = true;
+            dataGridView1.Columns["PrecioUnitario"].ReadOnly = true;
+            dataGridView1.Columns["SubTotal"].ReadOnly = true;
+            dataGridView1.Columns["Cantidad"].ReadOnly = false;
+        }
+
+        private void ConfigurarModosPago()
+        {
+            cmbModoPago.Items.Clear();
+            cmbModoPago.Items.Add("Efectivo");
+            cmbModoPago.Items.Add("Tarjeta");
+            cmbModoPago.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbModoPago.SelectedIndex = 0;
+        }
+
+        private void CargarInventario()
+        {
             try
             {
-                cmbModoPago.Items.Clear();
-                cmbModoPago.Items.Add("Efectivo");
-                cmbModoPago.Items.Add("Tarjeta");
-                cmbModoPago.DropDownStyle = ComboBoxStyle.DropDownList;
+                Cursor = Cursors.WaitCursor;
+                _inventario = new CN_Inventario().Listar() ?? new List<Inventario>();
 
-                if (cmbModoPago.Items.Contains("Tarjeta"))
-                {
-                    cmbModoPago.SelectedItem = "Tarjeta";
-                }
-                else if (cmbModoPago.Items.Count > 0)
-                {
-                    cmbModoPago.SelectedIndex = 0;
-                }
+                if (_inventario.Count == 0)
+                    Mensajes.Advertencia("El inventario esta vacio o no se pudo consultar la base de datos.");
             }
-            catch
+            catch (Exception ex)
             {
-                // Evitar que errores en la UI impidan la carga; no debería ocurrir.
+                Mensajes.Error("No se pudo cargar el inventario.", ex);
+                _inventario = new List<Inventario>();
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
             }
         }
 
+        /// <summary>
+        /// Trae los clientes una sola vez. Como ahora se escanean varios codigos
+        /// por factura, consultar la tabla completa en cada uno seria una
+        /// consulta por persona.
+        /// </summary>
+        private void CargarClientes()
+        {
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                _clientes = new CN_Cliente().Listar() ?? new List<Cliente>();
+            }
+            catch (Exception ex)
+            {
+                Mensajes.Error("No se pudo cargar la lista de clientes.", ex);
+                _clientes = new List<Cliente>();
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+        }
 
+        #endregion
+
+        #region Participantes
 
         private void iconButton1_Click(object sender, EventArgs e)
         {
-            using (var modal = new mdCliente())
+            using (mdCliente modal = new mdCliente())
             {
-                var result = modal.ShowDialog();
-
-                if (result == DialogResult.OK)
-                {
-                    txtQRCliente.Text = modal._Cliente.CodigoCliente.ToString();
-                    txtNombreCompleto.Text = modal._Cliente.Nombre.ToString() + " " + modal._Cliente.Apellido.ToString();
-
-
-                    try
-                    {
-                        presupuestoInicial = Convert.ToDecimal(modal._Cliente.Presupuesto);
-                        clienteSeleccionado = true;
-
-                        CodigoClienteSeleccionado = modal._Cliente.CodigoCliente;
-                        if (this.Controls.ContainsKey("txtPresupuesto"))
-                        {
-                            var ctrl = this.Controls["txtPresupuesto"] as TextBox;
-                            if (ctrl != null)
-                            {
-                                ctrl.Text = (-presupuestoInicial).ToString("0.00");
-                            }
-                        }
-                        if(txtQRCliente.Text == "1111")
-                        {
-                            Console.WriteLine();
-                        }
-                    }
-                    catch
-                    {
-                        presupuestoInicial = 0m;
-                        clienteSeleccionado = true;
-
-                    }
-                }
+                if (modal.ShowDialog() != DialogResult.OK) return;
+                AgregarParticipante(modal._Cliente);
             }
         }
 
-        
+        /// <summary>Enter en la caja de codigo agrega a la persona al grupo.</summary>
+        private void txtQRCliente_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+
+            string texto = (txtQRCliente.Text ?? string.Empty).Trim();
+            if (texto.Length == 0) return;
+
+            int codigo;
+            if (!Formato.TryEntero(texto, out codigo) || codigo <= 0)
+            {
+                Mensajes.Advertencia("El codigo de cliente debe ser un numero.");
+                txtQRCliente.SelectAll();
+                return;
+            }
+
+            Cliente cliente = _clientes.FirstOrDefault(c => c.CodigoCliente == codigo);
+
+            if (cliente == null)
+            {
+                // Puede ser un huesped registrado despues de abrir la pantalla.
+                CargarClientes();
+                cliente = _clientes.FirstOrDefault(c => c.CodigoCliente == codigo);
+            }
+
+            if (cliente == null)
+            {
+                Mensajes.Info(string.Format("No se encontro un cliente con el codigo {0}.", codigo));
+                txtQRCliente.SelectAll();
+                return;
+            }
+
+            AgregarParticipante(cliente);
+        }
+
+        private void AgregarParticipante(Cliente cliente)
+        {
+            if (cliente == null) return;
+
+            string error;
+            if (!_carrito.AgregarParticipante(cliente, out error))
+            {
+                Mensajes.Advertencia(error);
+                LimpiarCajaCodigoCliente();
+                return;
+            }
+
+            RefrescarParticipantes();
+            RefrescarTotales();
+            LimpiarCajaCodigoCliente();
+
+            // Con la primera persona ya se puede empezar a escanear productos.
+            if (_carrito.CantidadParticipantes == 1)
+            {
+                ActiveControl = txtCodigo;
+                txtCodigo.Focus();
+            }
+        }
+
+        private void gridClientes_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            if (gridClientes.Columns[e.ColumnIndex].Name != "QuitarCliente") return;
+
+            int codigo = Formato.EnteroDeCelda(
+                gridClientes.Rows[e.RowIndex].Cells["CodCliente"].Value);
+
+            if (codigo <= 0) return;
+
+            if (_carrito.CantidadParticipantes == 1 && !_carrito.EstaVacio)
+            {
+                if (!Mensajes.Confirmar(
+                        "Es la unica persona de la factura y ya hay productos cargados.\n\n" +
+                        "Si la quita, la venta se queda sin presupuesto asignado. Desea continuar?"))
+                    return;
+            }
+
+            _carrito.QuitarParticipante(codigo);
+
+            RefrescarParticipantes();
+            RefrescarTotales();
+        }
+
+        private void RefrescarParticipantes()
+        {
+            gridClientes.Rows.Clear();
+
+            foreach (ParticipanteVenta p in _carrito.Participantes)
+            {
+                int indice = gridClientes.Rows.Add();
+                DataGridViewRow fila = gridClientes.Rows[indice];
+
+                fila.Cells["CodCliente"].Value = p.CodigoCliente;
+                fila.Cells["NomCliente"].Value = p.Nombre;
+                fila.Cells["SaldoCliente"].Value = Formato.Moneda(p.SaldoAntes);
+                fila.Cells["AsignadoCliente"].Value = Formato.Moneda(p.Asignado);
+                fila.Cells["RestanteCliente"].Value = Formato.Moneda(p.SaldoDespues);
+
+                // Se marca en rojo a quien llego sin saldo: no aporta nada al
+                // presupuesto del grupo y conviene que el cajero lo vea.
+                if (p.SaldoAntes <= 0m)
+                    fila.DefaultCellStyle.ForeColor = Color.Firebrick;
+            }
+
+            _actualizandoCliente = true;
+            try
+            {
+                txtNombreCompleto.Text = _carrito.NombreCliente;
+            }
+            finally
+            {
+                _actualizandoCliente = false;
+            }
+        }
+
+        private void LimpiarCajaCodigoCliente()
+        {
+            _actualizandoCliente = true;
+            try
+            {
+                txtQRCliente.Clear();
+            }
+            finally
+            {
+                _actualizandoCliente = false;
+            }
+        }
+
+        /// <summary>
+        /// Se conserva porque el Designer tiene el evento cableado. Los
+        /// participantes se agregan con Enter o con la lupa, no mientras se
+        /// escribe: si se agregara en cada tecla, un codigo como 1001 intentaria
+        /// agregar al cliente 1, luego al 10, luego al 100.
+        /// </summary>
+        private void txtQRCliente_TextChanged(object sender, EventArgs e)
+        {
+            if (_actualizandoCliente) return;
+        }
+
+        private bool ValidarClienteSeleccionado()
+        {
+            if (_carrito.HayCliente) return true;
+
+            Mensajes.Advertencia(
+                "Debe agregar al menos una persona a la factura antes de cargar productos.");
+            ActiveControl = txtQRCliente;
+            txtQRCliente.Focus();
+            return false;
+        }
+
+        #endregion
+
+        #region Productos
 
         private void txtCodigo_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter) return;
-            if(txtCodigo.Text == "") return;
-            if (txtQRCliente.Text == "")
-            {
-                MessageBox.Show("Debe seleccionar un cliente antes de agregar productos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
-            // Evitar el sonido de 'ding' y la repetición de la tecla
             e.Handled = true;
             e.SuppressKeyPress = true;
 
-            var input = txtCodigo.Text?.Trim() ?? "";
-            if (string.IsNullOrEmpty(input))
-            {
-                MessageBox.Show("Ingrese un código de producto.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            string codigo = (txtCodigo.Text ?? string.Empty).Trim();
+            if (codigo.Length == 0) return;
 
-            List<Inventario> lista;
-            try
-            {
-                lista = new CN_Inventario().Listar();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al obtener inventario: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            if (!ValidarClienteSeleccionado()) return;
 
-            var item = lista.FirstOrDefault(i => i.Codigo.ToUpper() == txtCodigo.Text.ToUpper());
-            if (item == null)
+            Inventario articulo = _inventario.FirstOrDefault(i =>
+                string.Equals(i.Codigo, codigo, StringComparison.OrdinalIgnoreCase));
+
+            if (articulo == null)
             {
-                MessageBox.Show($"No se encontró producto con el código {txtCodigo.Text}.", "Producto no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Mensajes.Info(string.Format("No se encontro un producto con el codigo {0}.", codigo));
                 txtCodigo.Clear();
+                txtCodigo.Focus();
                 return;
             }
 
-            AgregarInventarioAlGrid(item);
+            AgregarArticulo(articulo);
+        }
 
-            // Limpiar y devolver foco
-            txtCodigo.Clear();
-            txtCodigo.Focus();
+        private void txtCodigo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar != '+' && e.KeyChar != '-') return;
+
+            e.Handled = true;
+
+            LineaVenta linea = _carrito.Primera;
+            if (linea == null) return;
+
+            if (e.KeyChar == '+')
+            {
+                string error;
+                if (!_carrito.Incrementar(linea.Codigo, out error))
+                {
+                    Mensajes.Advertencia(error);
+                    return;
+                }
+            }
+            else
+            {
+                _carrito.Disminuir(linea.Codigo);
+            }
+
+            RefrescarGrid();
         }
 
         private void iconButton2_Click(object sender, EventArgs e)
         {
-            if (txtQRCliente.Text == "")
+            if (!ValidarClienteSeleccionado()) return;
+
+            using (mdInventario modal = new mdInventario())
             {
-                MessageBox.Show("Debe seleccionar un cliente antes de agregar productos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            using (var modal = new mdInventario())
-            {
-                var result = modal.ShowDialog();
+                if (modal.ShowDialog() != DialogResult.OK) return;
+                if (modal._Inventario == null) return;
 
-                if (result == DialogResult.OK)
-                {
-                    List<Inventario> lista = new CN_Inventario().Listar();
-                    txtCodigo.Text = modal._Inventario.Codigo;
-
-                    var item = lista.FirstOrDefault(i => i.Codigo == txtCodigo.Text);
-                    if (item != null)
-                    {
-                        AgregarInventarioAlGrid(item);
-                        // Limpiar y devolver foco
-                        txtCodigo.Clear();
-                        txtCodigo.Focus();
-                    }
-
-                }
+                AgregarArticulo(modal._Inventario);
             }
         }
 
-        // Agrega un inventario al grid; si ya existe, incrementa cantidad y actualiza subtotal
-        private void AgregarInventarioAlGrid(Inventario inv)
+        private void AgregarArticulo(Inventario articulo)
         {
-            dataGridView1.Font = new Font("Segoe UI", 12);
-            dataGridView1.RowsDefaultCellStyle.BackColor = SystemColors.InactiveBorder;
-            dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = SystemColors.InactiveCaption;
-            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            string error;
 
-            if (inv == null) return;
-
-            string codigoStr = inv.Codigo.ToString();
-            string descripcion = inv.Descripcion ?? "";
-            decimal precio = inv.Precio;
-
-            // Buscar fila existente por Código
-            DataGridViewRow filaExistente = null;
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+            if (!_carrito.Agregar(articulo, out error))
             {
-                if (row.IsNewRow) continue;
-                if (Convert.ToString(row.Cells["Codigo"].Value) == codigoStr)
-                {
-                    filaExistente = row;
-                    break;
-                }
-            }
-
-            if (filaExistente != null)
-            {
-                // Existe: incrementar cantidad, eliminar y reinsertar al inicio
-                int cantidad = 1;
-                int.TryParse(Convert.ToString(filaExistente.Cells["Cantidad"].Value), out cantidad);
-                cantidad++;
-                decimal subtotal = cantidad * precio;
-
-                dataGridView1.Rows.Remove(filaExistente);
-                dataGridView1.Rows.Insert(0, new object[]
-                {
-                    codigoStr, descripcion, cantidad.ToString(), "",
-                    precio.ToString("0.00", CultureInfo.InvariantCulture), subtotal.ToString("0.00", CultureInfo.InvariantCulture), ""
-                });
-
-                CalcularTotales();
-                SeleccionarFilaSuperior();
+                Mensajes.Advertencia(error);
+                txtCodigo.Clear();
+                txtCodigo.Focus();
                 return;
             }
 
-            // Si no existe, insertar nueva fila al inicio con cantidad 1
-            dataGridView1.Rows.Insert(0, new object[]
-            {
-                codigoStr,              // Codigo
-                descripcion,            // Descripcion
-                1,                      // Cantidad
-                "",                     // Agregar (columna botón) -> placeholder
-                precio.ToString("0.00", CultureInfo.InvariantCulture),// SubTotal
-                precio.ToString("0.00", CultureInfo.InvariantCulture),// SubTotal inicial (cantidad 1)
-                ""                      // asd (columna botón) -> placeholder
-            });
+            RefrescarGrid();
 
-            CalcularTotales();
-            SeleccionarFilaSuperior();
+            txtCodigo.Clear();
+            txtCodigo.Focus();
         }
 
-        private void SeleccionarFilaSuperior()
+        #endregion
+
+        #region Grid de productos
+
+        /// <summary>
+        /// Vuelve a dibujar el grid de productos a partir del carrito, y de paso
+        /// refresca el reparto entre participantes, porque cada producto que se
+        /// agrega cambia cuanto le toca pagar a cada quien.
+        /// </summary>
+        private void RefrescarGrid()
         {
-            if (dataGridView1.Rows.Count > 0 && !dataGridView1.Rows[0].IsNewRow)
+            if (_refrescando) return;
+
+            _refrescando = true;
+            try
             {
-                dataGridView1.ClearSelection();
-                dataGridView1.Rows[0].Selected = true;
-            }
-        }
+                dataGridView1.Rows.Clear();
 
-        private void CalcularTotales()
-        {
-            decimal total = 0m;
-            int cantidadArticulos = 0;
-            decimal ventaTotal = 0m;
-
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
-                if (row.IsNewRow) continue;
-                decimal subtotal = 0m;
-                int cantidad = 0;
-                decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
-                int.TryParse(Convert.ToString(row.Cells["Cantidad"].Value), out cantidad);
-
-                total += subtotal;
-                cantidadArticulos += cantidad;
-            }
-
-            
-
-            txtCantidadArticulos.Text = cantidadArticulos.ToString();
-
-            if (clienteSeleccionado)
-            {
-                if(txtQRCliente.Text == "1111")
+                foreach (LineaVenta linea in _carrito.Lineas)
                 {
-                    Console.WriteLine("asd);");
+                    dataGridView1.Rows.Add(
+                        linea.Codigo,
+                        linea.Descripcion,
+                        linea.Cantidad,
+                        string.Empty,
+                        Formato.Moneda(linea.PrecioUnitario),
+                        Formato.Moneda(linea.SubTotal),
+                        string.Empty);
                 }
-                decimal presupuestoActual = -presupuestoInicial + total;
-                txtTotal.Text = presupuestoActual.ToString("0.00", CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                txtTotal.Text = totalVenta.ToString("0.00", CultureInfo.InvariantCulture);
-            }
 
-            txtTotalVenta.Text = total.ToString("0.00", CultureInfo.InvariantCulture);
+                if (dataGridView1.Rows.Count > 0)
+                {
+                    dataGridView1.ClearSelection();
+                    dataGridView1.Rows[0].Selected = true;
+                }
+
+                RefrescarParticipantes();
+                RefrescarTotales();
+            }
+            finally
+            {
+                _refrescando = false;
+            }
+        }
+
+        private void RefrescarTotales()
+        {
+            txtCantidadArticulos.Text = Formato.Entero(_carrito.CantidadArticulos);
+            txtTotalVenta.Text = Formato.Moneda(_carrito.Total);
+            txtTotal.Text = Formato.Moneda(_carrito.ExtraAPagar);
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            try
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+            string codigo = Formato.TextoDeCelda(dataGridView1.Rows[e.RowIndex].Cells["Codigo"].Value);
+            if (string.IsNullOrEmpty(codigo)) return;
+
+            if (GridHelper.ClickEnColumna(dataGridView1, e, "Agregar"))
             {
-                if (e.RowIndex < 0) return;
-
-                var column = dataGridView1.Columns[e.ColumnIndex];
-                if (column == null) return;
-
-                var row = dataGridView1.Rows[e.RowIndex];
-                if (row == null || row.IsNewRow) return;
-
-                // Lectura segura de cantidad y subtotal actuales
-                int cantidad = 0;
-                decimal subtotal = 0m;
-                int.TryParse(Convert.ToString(row.Cells["Cantidad"].Value), out cantidad);
-                decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
-
-                // Determinar acción por nombre de columna
-                if (column.Name == "Agregar")
+                string error;
+                if (!_carrito.Incrementar(codigo, out error))
                 {
-                    // Incrementar 1
-                    decimal precioUnitario = 0m;
-                    if (cantidad > 0)
-                    {
-                        // deducir precio unitario del subtotal
-                        precioUnitario = subtotal / Math.Max(cantidad, 1);
-                    }
-                    else
-                    {
-                        // si no hay subtotal ni cantidad, intentar leer precio unitario desde fila (si existe una columna oculta u otra fuente)
-                        // aquí asumimos que cuando se agregó la fila con cantidad=1, SubTotal ya lleva el precio unitario; si subtotal es 0 y cantidad 0,
-                        // no podemos calcular: dejar precioUnitario en 0 y evitar división por cero
-                        decimal.TryParse(Convert.ToString(row.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out precioUnitario);
-                    }
-
-                    // Si precioUnitario es 0 y cantidad==0, intentar inferirlo desde el último valor conocido (no disponible), por ahora no cambiaría subtotal.
-                    int nuevaCantidad = cantidad + 1;
-                    decimal nuevoSubtotal = Math.Round(precioUnitario * nuevaCantidad, 2);
-
-                    // Si subtotal era 0 y precioUnitario 0, intentar usar el valor actual de SubTotal como unitario (fallback)
-                    if (precioUnitario == 0m && subtotal == 0m)
-                    {
-                        // no hay precio conocido; no modificar y avisar
-                        MessageBox.Show("No se puede obtener el precio unitario para aumentar la cantidad.", "Precio desconocido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    row.Cells["Cantidad"].Value = nuevaCantidad.ToString();
-                    row.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
-
-                    CalcularTotales();
+                    Mensajes.Advertencia(error);
                     return;
                 }
-
-                if (column.Name == "asd")
-                {
-                    if (cantidad <= 0) return;
-
-                    if (cantidad == 1)
-                    {
-                        // eliminar fila si queda 0
-                        dataGridView1.Rows.RemoveAt(e.RowIndex);
-                        CalcularTotales();
-                        return;
-                    }
-
-                    // calcular precio unitario a partir del subtotal actual
-                    decimal precioUnitario = subtotal / Math.Max(cantidad, 1);
-                    int nuevaCantidad = cantidad - 1;
-                    decimal nuevoSubtotal = Math.Round(precioUnitario * nuevaCantidad, 2);
-
-                    row.Cells["Cantidad"].Value = nuevaCantidad.ToString();
-                    row.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
-
-                    CalcularTotales();
-                    return;
-                }
+                RefrescarGrid();
+                return;
             }
-            catch (Exception ex)
+
+            if (GridHelper.ClickEnColumna(dataGridView1, e, "asd"))
             {
-                MessageBox.Show("Error al procesar acción del grid: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _carrito.Disminuir(codigo);
+                RefrescarGrid();
             }
+        }
+
+        private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (_refrescando) return;
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            if (dataGridView1.Columns[e.ColumnIndex].Name != "Cantidad") return;
+
+            DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
+            string codigo = Formato.TextoDeCelda(fila.Cells["Codigo"].Value);
+
+            int cantidad;
+            if (!Formato.TryEntero(Formato.TextoDeCelda(fila.Cells["Cantidad"].Value), out cantidad))
+            {
+                Mensajes.Advertencia("La cantidad debe ser un numero entero.");
+                RefrescarGrid();
+                return;
+            }
+
+            string error;
+            if (!_carrito.FijarCantidad(codigo, cantidad, out error))
+                Mensajes.Advertencia(error);
+
+            RefrescarGrid();
         }
 
         private void dataGridView1_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-
-            if (e.RowIndex < 0)
-                return;
-
-            // Obtener el índice actual de la columna por nombre en vez de asumir 0
-            var iconCol = dataGridView1.Columns["Agregar"];
-            var iconCol2 = dataGridView1.Columns["asd"];
-            if (iconCol == null)
-                return;
-
-            if (e.ColumnIndex == iconCol.Index)
+            if (GridHelper.PintarIcono(dataGridView1, e, "Agregar", Properties.Resources.mas))
             {
-                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
-                var bmp = Properties.Resources.mas;
-                if (bmp != null)
-                {
-                    var w = bmp.Width;
-                    var h = bmp.Height;
-                    // Escalar si la imagen es más grande que la celda
-                    var maxW = e.CellBounds.Width - 4;
-                    var maxH = e.CellBounds.Height - 4;
-                    if (w > maxW || h > maxH)
-                    {
-                        var scale = Math.Min((float)maxW / w, (float)maxH / h);
-                        w = (int)(w * scale);
-                        h = (int)(h * scale);
-                    }
-                    var x = e.CellBounds.Left + (e.CellBounds.Width - w) / 2;
-                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
-                    e.Graphics.DrawImage(bmp, new Rectangle(x, y, w, h));
-                }
                 e.Handled = true;
+                return;
             }
-            if (e.ColumnIndex == iconCol2.Index)
+
+            if (GridHelper.PintarIcono(dataGridView1, e, "asd",
+                    Properties.Resources.signo_menos_de_una_linea_en_posicion_horizontal))
             {
-                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
-                var bmp = Properties.Resources.signo_menos_de_una_linea_en_posicion_horizontal;
-                if (bmp != null)
-                {
-                    var w = bmp.Width;
-                    var h = bmp.Height;
-                    // Escalar si la imagen es más grande que la celda
-                    var maxW = e.CellBounds.Width - 4;
-                    var maxH = e.CellBounds.Height - 4;
-                    if (w > maxW || h > maxH)
-                    {
-                        var scale = Math.Min((float)maxW / w, (float)maxH / h);
-                        w = (int)(w * scale);
-                        h = (int)(h * scale);
-                    }
-                    var x = e.CellBounds.Left + (e.CellBounds.Width - w) / 2;
-                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
-                    e.Graphics.DrawImage(bmp, new Rectangle(x, y, w, h));
-                }
                 e.Handled = true;
-            }
-
-        }
-
-        private void btnGuardar_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtQRCliente.Text))
-            {
-                MessageBox.Show("Debe agregar un cliente", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
-            if (dataGridView1.Rows.Count < 1)
-            {
-                MessageBox.Show("Debe agregar productos al detalle de la venta", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            // Construir DataTable exactamente como el UDT dbo.EDetalle_Venta
-            DataTable dtDetalle = new DataTable();
-
-            dtDetalle.Columns.Add("IdInventario", typeof(string));
-            dtDetalle.Columns.Add("Detalle", typeof(string));
-            dtDetalle.Columns.Add("Precio", typeof(decimal));
-            dtDetalle.Columns.Add("Cantidad", typeof(int));
-            dtDetalle.Columns.Add("MontoTotal", typeof(decimal));
-
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
-                dtDetalle.Rows.Add(
-                    row.Cells["Codigo"].Value.ToString(),
-                    row.Cells["Descripcion"].Value.ToString(),
-                    decimal.Parse(row.Cells["PrecioUnitario"].Value.ToString(), CultureInfo.InvariantCulture),
-                    Convert.ToInt32(row.Cells["Cantidad"].Value),
-                    decimal.Parse(row.Cells["SubTotal"].Value.ToString(), CultureInfo.InvariantCulture)
-                );
-            }
-
-            // Validar/parsear cliente
-            int idCliente = 0;
-            if (!int.TryParse(txtQRCliente.Text, out idCliente))
-            {
-                MessageBox.Show("Código de cliente inválido.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
-
-            int IdCorrelativo = new CN_Venta().ObtenerCorrelativo();
-            string NumeroVentaStr = string.Format("{0:000}", IdCorrelativo);
-
-            Venta oVenta = new Venta()
-            {
-                oUsuario = new Usuario() { IdUsuario = _Usuario.IdUsuario },
-                NumeroFact = Convert.ToInt32(NumeroVentaStr),
-                oCliente = new Cliente() { CodigoCliente = CodigoClienteSeleccionado },
-
-                NombreCliente = txtNombreCompleto.Text,
-                ModoPago = cmbModoPago.SelectedItem.ToString(),
-                MontoTotal = decimal.TryParse(txtTotal.Text, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal mt) ? mt : 0,
-                FechaRegistro = DateTime.Now
-            };
-
-            string Mensaje = string.Empty;
-            // Registrar la venta primero
-            bool respuesta = new CN_Venta().Registrar(oVenta, dtDetalle, out Mensaje);
-
-            if (respuesta)
-            {
-                // Calcular el nuevo presupuesto (disponible)
-                // txtTotal muestra: -PresupuestoActual + GastosVenta
-                // Si txtTotal es 0, significa que se gastó exactamente el presupuesto.
-                decimal resultadoCalculado = 0m;
-                decimal.TryParse(txtTotal.Text, NumberStyles.Number, CultureInfo.InvariantCulture, out resultadoCalculado);
-                
-                decimal nuevoPresupuesto;
-                if (resultadoCalculado >= 0)
-                {
-                    // Si el resultado es 0 o positivo (deuda), el presupuesto disponible queda en 0
-                    nuevoPresupuesto = 0m;
-                }
-                else
-                {
-                    // Si el resultado es negativo (ej: -40), significa que sobran 40 de presupuesto
-                    nuevoPresupuesto = Math.Abs(resultadoCalculado);
-                }
-
-                string mensajePresupuesto = string.Empty;
-                // Se actualiza el campo 'Presupuesto' (saldo actual) en la base de datos
-                new CN_Cliente().ActualizarPresupuesto(CodigoClienteSeleccionado, nuevoPresupuesto, out mensajePresupuesto);
-
-                MessageBox.Show("Venta registrada correctamente", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                
-                txtQRCliente.Text = "";
-                txtNombreCompleto.Text = "";
-                txtTotal.Text = "";
-                dataGridView1.Rows.Clear();
-
-                presupuestoInicial = 0m;
-                clienteSeleccionado = false;
-                totalVenta = 0m;
-                CodigoClienteSeleccionado = 0;
-                if (this.Controls.ContainsKey("txtPresupuesto"))
-                {
-                    var ctrl = this.Controls["txtPresupuesto"] as TextBox;
-                    if (ctrl != null) ctrl.Text = "";
-                }
-
-                // Mover el cursor (focus) automáticamente a txtQRCliente
-                this.ActiveControl = txtQRCliente;   
-                txtQRCliente.Focus();                
-
-            }
-            else
-            {
-                MessageBox.Show(Mensaje, "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-        
-
-        private void iconButton4_Click(object sender, EventArgs e)
-        {
-            var result = MessageBox.Show("¿Desea borrar la venta actual y limpiar el formulario?", "Confirmar borrado", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result != DialogResult.Yes) return;
-
-            // Limpiar campos y grid
-            txtQRCliente.Text = "";
-            txtNombreCompleto.Text = "";
-            txtTotal.Text = "";
-            txtCantidadArticulos.Text = "";
-            txtTotalVenta.Text = "";
-            dataGridView1.Rows.Clear();
-
-            // Restaurar modo de pago por defecto si existe
-            if (cmbModoPago != null)
-            {
-                if (cmbModoPago.Items.Contains("Tarjeta"))
-                    cmbModoPago.SelectedItem = "Tarjeta";
-                else if (cmbModoPago.Items.Count > 0)
-                    cmbModoPago.SelectedIndex = 0;
-            }
-
-            // Devolver foco al campo de cliente
-            this.ActiveControl = txtQRCliente;
-            txtQRCliente.Focus();
-        }
-
-        private void txtQRCliente_TextChanged(object sender, EventArgs e)
-        {
-            dataGridView1.Rows.Clear();
-            if (txtQRCliente.TextLength >= 4)
-            {
-                 
-                var input = txtQRCliente.Text?.Trim() ?? "";
-
-                if (string.IsNullOrEmpty(input))
-                {
-                    MessageBox.Show("Ingrese un código de cliente.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!int.TryParse(input, out int codigo))
-                {
-                    MessageBox.Show("El código debe ser un número válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Buscar cliente por código usando la lista actual. Mejor crear un método específico en CN_Cliente si la lista es grande.
-                List<Cliente> lista;
-                try
-                {
-                    lista = new CN_Cliente().Listar();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al obtener clientes: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                var cliente = lista.FirstOrDefault(c => c.CodigoCliente == codigo);
-
-                if (cliente != null)
-                {
-                    txtQRCliente.Text = cliente.CodigoCliente.ToString();
-                    txtNombreCompleto.Text = cliente.Nombre ?? "";
-                    try
-                    {
-                        presupuestoInicial = Convert.ToDecimal(cliente.Presupuesto);
-                    }
-                    catch
-                    {
-                        presupuestoInicial = 0m;
-                    }
-
-                    clienteSeleccionado = true;
-                    CodigoClienteSeleccionado = cliente.CodigoCliente;
-
-                    if (this.Controls.ContainsKey("txtPresupuesto"))
-                    {
-                        var ctrl = this.Controls["txtPresupuesto"] as TextBox;
-                        if (ctrl != null)
-                        {
-                            ctrl.Text = (-presupuestoInicial).ToString("0.00");
-                        }
-                    }
-
-                    txtTotal.Text = (-presupuestoInicial).ToString("0.00", CultureInfo.InvariantCulture);
-                    totalVenta = 0m;
-
-                    this.ActiveControl = txtCodigo;
-                    txtCodigo.Focus();
-                }
-                else
-                {
-                    txtNombreCompleto.Text = "";
-                    MessageBox.Show($"No se encontró un cliente con el código {codigo}.", "Cliente no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
             }
         }
 
         private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode != Keys.Delete) return;
+            if (dataGridView1.CurrentRow == null) return;
 
+            e.Handled = true;
+
+            string codigo = Formato.TextoDeCelda(dataGridView1.CurrentRow.Cells["Codigo"].Value);
+            if (string.IsNullOrEmpty(codigo)) return;
+
+            _carrito.Quitar(codigo);
+            RefrescarGrid();
         }
 
-        private void txtCodigo_KeyPress(object sender, KeyPressEventArgs e)
+        #endregion
+
+        #region Guardar
+
+        private void btnGuardar_Click(object sender, EventArgs e)
         {
-            if (e.KeyChar == '+')
+            if (!ValidarVenta()) return;
+
+            decimal totalVenta = _carrito.Total;
+            decimal presupuestoUsado = _carrito.PresupuestoUsado;
+            decimal extraAPagar = _carrito.ExtraAPagar;
+
+            List<ParticipanteVenta> participantes = _carrito.ConstruirParticipantes();
+
+            if (!ConfirmarReparto(totalVenta, extraAPagar, participantes)) return;
+
+            Venta venta = ConstruirVenta(totalVenta, participantes);
+            DataTable detalle = _carrito.ConstruirDetalle();
+
+            string mensaje;
+            bool registrada;
+
+            try
             {
-                e.Handled = true;
-
-                // El último agregado siempre está en la primera fila
-                var ultimaFila = dataGridView1.Rows.Cast<DataGridViewRow>()
-                                    .FirstOrDefault(r => !r.IsNewRow);
-                if (ultimaFila == null) return;
-
-                int cantidad = 0;
-                decimal subtotal = 0m;
-                int.TryParse(Convert.ToString(ultimaFila.Cells["Cantidad"].Value), out cantidad);
-                decimal.TryParse(Convert.ToString(ultimaFila.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
-
-                decimal precioUnitario = subtotal / Math.Max(cantidad, 1);
-                int nuevaCantidad = cantidad + 1;
-                decimal nuevoSubtotal = Math.Round(precioUnitario * nuevaCantidad, 2);
-
-                ultimaFila.Cells["Cantidad"].Value = nuevaCantidad.ToString();
-                ultimaFila.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
-
-                CalcularTotales();
-                SeleccionarFilaSuperior();
+                Cursor = Cursors.WaitCursor;
+                registrada = new CN_Venta().Registrar(venta, detalle, out mensaje);
             }
-            else if (e.KeyChar == '-')
+            catch (Exception ex)
             {
-                e.Handled = true;
+                Mensajes.Error("No se pudo registrar la venta.", ex);
+                return;
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
 
-                // El último agregado siempre está en la primera fila
-                var ultimaFila = dataGridView1.Rows.Cast<DataGridViewRow>()
-                                    .FirstOrDefault(r => !r.IsNewRow);
-                if (ultimaFila == null) return;
+            if (!registrada)
+            {
+                Mensajes.Error(string.IsNullOrWhiteSpace(mensaje)
+                    ? "No se pudo registrar la venta."
+                    : mensaje);
+                return;
+            }
 
-                int cantidad = 0;
-                decimal subtotal = 0m;
-                int.TryParse(Convert.ToString(ultimaFila.Cells["Cantidad"].Value), out cantidad);
-                decimal.TryParse(Convert.ToString(ultimaFila.Cells["SubTotal"].Value), NumberStyles.Number, CultureInfo.InvariantCulture, out subtotal);
+            MostrarComprobante(venta.NumeroFact, totalVenta, presupuestoUsado,
+                               extraAPagar, participantes);
 
-                if (cantidad == 1)
-                {
-                    // Si queda 1, eliminar la fila igual que la columna "asd"
-                    dataGridView1.Rows.Remove(ultimaFila);
-                    CalcularTotales();
-                    SeleccionarFilaSuperior();
-                    return;
-                }
+            // Los saldos y el stock cambiaron en el servidor.
+            CargarInventario();
+            CargarClientes();
+            LimpiarVenta();
+        }
 
-                decimal precioUnitario = subtotal / Math.Max(cantidad, 1);
-                int nuevaCantidad = cantidad - 1;
-                decimal nuevoSubtotal = Math.Round(precioUnitario * nuevaCantidad, 2);
+        /// <summary>
+        /// Muestra el reparto antes de guardar. Con varias personas involucradas
+        /// conviene que el cajero pueda leerlo en voz alta y confirmar, porque
+        /// despues de guardar deshacerlo implica corregir saldos a mano.
+        /// </summary>
+        private bool ConfirmarReparto(decimal total, decimal extra,
+                                      List<ParticipanteVenta> participantes)
+        {
+            if (participantes.Count < 2) return true;
 
-                ultimaFila.Cells["Cantidad"].Value = nuevaCantidad.ToString();
-                ultimaFila.Cells["SubTotal"].Value = nuevoSubtotal.ToString("0.00", CultureInfo.InvariantCulture);
+            string detalle = string.Join("\n", participantes.Select(p =>
+                string.Format("   {0} - {1}: paga {2}  (le quedan {3})",
+                              p.CodigoCliente, p.Nombre,
+                              Formato.Moneda(p.Asignado),
+                              Formato.Moneda(p.SaldoDespues))));
 
-                CalcularTotales();
-                SeleccionarFilaSuperior();
+            string texto = string.Format(
+                "La factura de {0} se reparte entre {1} personas:\n\n{2}",
+                Formato.Moneda(total), participantes.Count, detalle);
+
+            if (extra > 0m)
+                texto += string.Format("\n\nA pagar en efectivo o tarjeta: {0}", Formato.Moneda(extra));
+
+            return Mensajes.Confirmar(texto + "\n\nConfirma la venta?");
+        }
+
+        private bool ValidarVenta()
+        {
+            if (_usuario == null)
+            {
+                Mensajes.Error("No hay un usuario valido en la sesion.");
+                return false;
+            }
+
+            if (!_carrito.HayCliente)
+            {
+                Mensajes.Advertencia("Debe agregar al menos una persona a la factura.");
+                return false;
+            }
+
+            if (_carrito.EstaVacio)
+            {
+                Mensajes.Advertencia("Debe agregar productos al detalle de la venta.");
+                return false;
+            }
+
+            if (cmbModoPago.SelectedItem == null)
+            {
+                Mensajes.Advertencia("Seleccione el modo de pago.");
+                cmbModoPago.Focus();
+                return false;
+            }
+
+            if (_carrito.Total <= 0m)
+            {
+                Mensajes.Advertencia("El total de la venta debe ser mayor que cero.");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Arma el objeto Venta.
+        ///
+        /// MontoTotal es el total real de la venta.
+        ///
+        /// oCliente sigue apuntando al participante principal para que la
+        /// cabecera, la clave foranea y el reporte actual no cambien.
+        /// oParticipantes lleva al grupo completo.
+        ///
+        /// El reparto definitivo lo calcula usp_RegistrarVenta con los saldos
+        /// reales y las filas bloqueadas: lo que se ve en pantalla es la vista
+        /// previa. Si alguien consumio en otra caja entre medio, manda el
+        /// procedimiento.
+        /// </summary>
+        private Venta ConstruirVenta(decimal totalVenta, List<ParticipanteVenta> participantes)
+        {
+            return new Venta
+            {
+                oUsuario = new Usuario { IdUsuario = _usuario.IdUsuario },
+                oCliente = new Cliente { CodigoCliente = _carrito.CodigoCliente },
+                oParticipantes = participantes,
+                NombreCliente = _carrito.NombreCliente,
+                ModoPago = cmbModoPago.SelectedItem.ToString(),
+                NumeroFact = ObtenerNumeroFactura(),
+                MontoTotal = totalVenta,
+                FechaRegistro = DateTime.Now
+            };
+        }
+
+        /// <summary>
+        /// Numero de factura de referencia.
+        ///
+        /// CD_Venta.ObtenerCorrelativo() sigue usando "select count(*) + 1".
+        /// Ya no es peligroso: usp_RegistrarVenta verifica que el numero este
+        /// libre y, si no lo esta, toma el siguiente de dbo.SEQ_NumeroFactura.
+        /// Con la restriccion UNIQUE de la tabla, duplicarlo es imposible.
+        /// </summary>
+        private int ObtenerNumeroFactura()
+        {
+            try
+            {
+                int correlativo = new CN_Venta().ObtenerCorrelativo();
+                return correlativo > 0 ? correlativo : 1;
+            }
+            catch (Exception ex)
+            {
+                Mensajes.Error("No se pudo obtener el numero de factura.", ex);
+                return 1;
             }
         }
+
+        private void MostrarComprobante(int numeroFactura, decimal total, decimal presupuestoUsado,
+                                        decimal extra, List<ParticipanteVenta> participantes)
+        {
+            string reparto = string.Join("\n", participantes.Select(p =>
+                string.Format("   {0} - {1}: {2}   (saldo: {3})",
+                              p.CodigoCliente, p.Nombre,
+                              Formato.Moneda(p.Asignado),
+                              Formato.Moneda(p.SaldoDespues))));
+
+            Mensajes.Info(string.Format(
+                "Venta registrada correctamente.\n\n" +
+                "Numero de factura : {0}\n" +
+                "Total de venta    : {1}\n" +
+                "Presupuesto usado : {2}\n" +
+                "Pago del cliente  : {3}\n\n" +
+                "Reparto:\n{4}",
+                numeroFactura,
+                Formato.Moneda(total),
+                Formato.Moneda(presupuestoUsado),
+                Formato.Moneda(extra),
+                reparto));
+        }
+
+        #endregion
+
+        #region Limpiar
+
+        private void iconButton4_Click(object sender, EventArgs e)
+        {
+            if (_carrito.EstaVacio && !_carrito.HayCliente) return;
+
+            if (!Mensajes.Confirmar("Desea borrar la venta actual y limpiar el formulario?"))
+                return;
+
+            LimpiarVenta();
+        }
+
+        private void LimpiarVenta()
+        {
+            _carrito.Limpiar();
+            _carrito.QuitarTodosLosParticipantes();
+
+            LimpiarCajaCodigoCliente();
+
+            _actualizandoCliente = true;
+            try
+            {
+                txtNombreCompleto.Clear();
+            }
+            finally
+            {
+                _actualizandoCliente = false;
+            }
+
+            txtCodigo.Clear();
+
+            if (cmbModoPago.Items.Count > 0) cmbModoPago.SelectedIndex = 0;
+
+            RefrescarGrid();
+
+            ActiveControl = txtQRCliente;
+            txtQRCliente.Focus();
+        }
+
+        #endregion
     }
 }

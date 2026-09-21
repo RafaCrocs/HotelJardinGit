@@ -19,5 +19,17 @@ namespace CapaEntidad
         public DateTime FechaRegistro { get; set; }
         public List<DetalleVenta> oDetalleVenta { get; set; } = new List<DetalleVenta>();
 
+        /// <summary>
+        /// Personas que comparten esta factura y aportan su presupuesto.
+        ///
+        /// Si queda vacia, la venta se registra a nombre de oCliente y el
+        /// comportamiento es identico al de antes: el procedimiento almacenado
+        /// acepta las dos formas.
+        ///
+        /// El reparto definitivo lo hace usp_RegistrarVenta con los saldos
+        /// reales; lo que viaja desde aqui son los codigos y su orden.
+        /// </summary>
+        public List<ParticipanteVenta> oParticipantes { get; set; } = new List<ParticipanteVenta>();
+
     }
 }

@@ -1,79 +1,100 @@
-﻿using Capa_Presentacion.Utilidades;
-using CapaEntidad;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using Capa_Presentacion.Utilidades;
 using CapaEntidad;
 using CapaNegocio;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Capa_Presentacion.Modales
 {
     public partial class mdInventario : Form
     {
+        /// <summary>Articulo elegido, completo. Queda en null si se cierra sin seleccionar.</summary>
+        public Inventario _Inventario { get; private set; }
 
-        public Inventario _Inventario { get; set; }
-
-        private List<Inventario> inventario = new CN_Inventario().Listar();
+        private List<Inventario> _inventario = new List<Inventario>();
 
         public mdInventario()
         {
             InitializeComponent();
         }
 
-        private void cargarGrid()
-        {
-
-            dataGridInventario.Font = new Font("Segoe UI", 12);
-            dataGridInventario.RowsDefaultCellStyle.BackColor = SystemColors.InactiveBorder;
-            dataGridInventario.AlternatingRowsDefaultCellStyle.BackColor = SystemColors.InactiveCaption;
-            dataGridInventario.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-
-
-            List<Inventario> lista = new CN_Inventario().Listar();
-            dataGridInventario.DataSource = lista;
-        }
-
-
-
+        /// <summary>
+        /// La carga se hace aqui y no en el inicializador del campo.
+        /// En el original la lista se llenaba con "new CN_Inventario().Listar()" como
+        /// valor inicial del campo, lo que significa que se golpeaba la base de datos
+        /// dentro del constructor del formulario: si fallaba, la excepcion salia antes
+        /// de que existiera la ventana y era imposible mostrar un mensaje decente.
+        /// </summary>
         private void mdProducto_Load(object sender, EventArgs e)
         {
-            cargarGrid();
+            GridHelper.PrepararParaBinding(dataGridInventario);
+            CargarGrid();
+            txtbusqueda.Focus();
         }
 
+        private void CargarGrid()
+        {
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                _inventario = new CN_Inventario().Listar() ?? new List<Inventario>();
+                dataGridInventario.DataSource = _inventario;
+            }
+            catch (Exception ex)
+            {
+                Mensajes.Error("No se pudo cargar el inventario.", ex);
+                _inventario = new List<Inventario>();
+                dataGridInventario.DataSource = _inventario;
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+        }
 
         private void dataGridInventario_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            int iRow = e.RowIndex;
-            int iColumn = e.ColumnIndex;
-            if (iRow >= 0 && iColumn >= 0)
+            if (e.RowIndex < 0) return;
+
+            Inventario seleccionado = dataGridInventario.Rows[e.RowIndex].DataBoundItem as Inventario;
+
+            if (seleccionado == null)
             {
-                _Inventario = new Inventario()
-                {
-                    Codigo = dataGridInventario.Rows[iRow].Cells["Codigo"].Value.ToString(),
-                };
-                this.DialogResult = DialogResult.OK;
-                this.Close();
+                Mensajes.Advertencia("No se pudo leer el articulo seleccionado.");
+                return;
             }
+
+            if (seleccionado.Cantidad <= 0)
+            {
+                Mensajes.Advertencia(
+                    string.Format("\"{0}\" no tiene existencias disponibles.",
+                                  seleccionado.Descripcion));
+                return;
+            }
+
+            _Inventario = seleccionado;
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         private void txtbusqueda_TextChanged(object sender, EventArgs e)
         {
+            string filtro = (txtbusqueda.Text ?? string.Empty).Trim().ToLower();
 
-            if (txtbusqueda.Text.Length >= 3)
+            if (filtro.Length < 3)
             {
-                var listaFiltrada = inventario.Where(x => (x.Descripcion ?? "").ToLower().Contains((txtbusqueda.Text).ToLower()) || (x.Codigo.ToString() ?? "").Contains((txtbusqueda.Text)) || (x.Proveedor ?? "").ToLower().Contains((txtbusqueda.Text).ToLower())).ToList();
-                dataGridInventario.DataSource = listaFiltrada;
+                dataGridInventario.DataSource = _inventario;
+                return;
             }
-            else
-            {
-                dataGridInventario.DataSource = inventario;
-            }
+
+            List<Inventario> filtrados = _inventario.Where(i =>
+                (i.Descripcion ?? string.Empty).ToLower().Contains(filtro) ||
+                (i.Codigo ?? string.Empty).ToLower().Contains(filtro) ||
+                (i.Proveedor ?? string.Empty).ToLower().Contains(filtro)).ToList();
+
+            dataGridInventario.DataSource = filtrados;
         }
     }
 }
